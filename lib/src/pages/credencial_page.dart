@@ -1,8 +1,13 @@
 
 import 'package:credencializacion_digital/src/models/Usuario.dart';
+import 'package:credencializacion_digital/src/pages/inicio_sesion_page.dart';
+import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:credencializacion_digital/src/widgets/menu_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_microsoft_authentication/flutter_microsoft_authentication.dart';
 import 'package:meta/meta.dart';
+import 'package:provider/provider.dart';
 
 class CredencialPage extends StatefulWidget {
   static final String routeName='credencial';
@@ -28,9 +33,32 @@ class _CredencialPageState extends State<CredencialPage> {
     status: 'Alumno',
     fotografia: 'https://image.freepik.com/vector-gratis/hombre-muestra-gesto-gran-idea_10045-637.jpg'
   );
+  FlutterMicrosoftAuthentication fma;
+  @override
+  void initState() {
+    super.initState();
+
+    fma = FlutterMicrosoftAuthentication(
+      kClientID: "86614fe5-8390-4852-b473-7aac5bf50548",
+      kAuthority: "https://login.microsoftonline.com/organizations",
+      kScopes: ["User.Read", "User.ReadBasic.All"],
+      androidConfigAssetPath: "assets/auth_config.json"
+    );
+  }
+  Future<void> _signOut() async {
+    String authToken;
+    try {
+      authToken = await this.fma.signOut;
+      Navigator.pushReplacementNamed(context, InicioSesionPage.routeName);
+    } on PlatformException catch(e) {
+      authToken = 'Failed to sign out.';
+      print(e.message);
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final size=MediaQuery.of(context).size;
+    final appTheme= Provider.of<ThemeChanger>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -47,6 +75,16 @@ class _CredencialPageState extends State<CredencialPage> {
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: _InfoAcademica(user: usuario,),
           ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: ElevatedButton(
+            onPressed: _signOut,
+             child: Text("Cerrar sesión"),
+             style: ElevatedButton.styleFrom(
+               primary:appTheme.currentTheme.accentColor
+             ),
+          ),
+          )
           
         ],
       )

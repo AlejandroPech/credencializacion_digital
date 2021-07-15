@@ -1,3 +1,6 @@
+import 'package:credencializacion_digital/src/pages/empresas_page.dart';
+import 'package:credencializacion_digital/src/services/microsoft_service.dart';
+import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -5,6 +8,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'package:flutter_microsoft_authentication/flutter_microsoft_authentication.dart';
+import 'package:provider/provider.dart';
 
 class InicioSesionPage extends StatefulWidget {
   static final String routeName='inicioSesion';
@@ -17,9 +21,9 @@ class InicioSesionPage extends StatefulWidget {
 class _InicioSesionPageState extends State<InicioSesionPage> {
   String _graphURI = "https://graph.microsoft.com/v1.0/me/";
 
-  String _authToken = 'Unknown Auth Token';
-  String _username = 'No Account';
-  String _msProfile = 'Unknown Profile';
+  String _authToken = '';
+  String _username = '';
+  String _msProfile = '';
 
   FlutterMicrosoftAuthentication fma;
 
@@ -33,33 +37,17 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
       kScopes: ["User.Read", "User.ReadBasic.All"],
       androidConfigAssetPath: "assets/auth_config.json"
     );
-    print('INITIALIZED FMA');
   }
 
   Future<void> _acquireTokenInteractively() async {
     String authToken;
     try {
-      authToken = await this.fma.acquireTokenInteractively;
+      _authToken = await this.fma.acquireTokenInteractively;
+      Navigator.pushReplacementNamed(context, EmpresaPage.routeName);
     } on PlatformException catch(e) {
       authToken = 'Failed to get token.';
       print(e.message);
     }
-    setState(() {
-      _authToken = authToken;
-    });
-  }
-
-  Future<void> _acquireTokenSilently() async {
-    String authToken;
-    try {
-      authToken = await this.fma.acquireTokenSilently;
-    } on PlatformException catch(e) {
-      authToken = 'Failed to get token silently.';
-      print(e.message);
-    }
-    setState(() {
-      _authToken = authToken;
-    });
   }
 
   Future<void> _signOut() async {
@@ -76,12 +64,13 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
   }
 
   Future<String> _loadAccount() async {
-    String username = await this.fma.loadAccount;
+    String username = await fma.loadAccount;
+    _username = "username";
     setState(() {
-      _username = username;
+      
+      
     });
   }
-
   _fetchMicrosoftProfile() async {
     var response = await http.get(Uri.parse(_graphURI), headers: {
       "Authorization": "Bearer " + this._authToken
@@ -91,43 +80,40 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
       _msProfile = json.decode(response.body).toString();
     });
   }
-
   @override
   Widget build(BuildContext context) {
-    
+    final appTheme= Provider.of<ThemeChanger>(context);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Microsoft Authentication'),
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              ElevatedButton( onPressed: _acquireTokenInteractively,
-                child: Text('Acquire Token'),),
-              ElevatedButton( onPressed: _acquireTokenSilently,
-                  child: Text('Acquire Token Silently')),
-              ElevatedButton( onPressed: _signOut,
-                  child: Text('Sign Out')),
-              ElevatedButton( onPressed: _fetchMicrosoftProfile,
-                  child: Text('Fetch Profile')),
-              if (Platform.isAndroid == true)
-                ElevatedButton( onPressed: _loadAccount,
-                    child: Text('Load account')),
-              SizedBox(height: 8,),
-              if (Platform.isAndroid == true)
-                Text( "Username: $_username"),
-              SizedBox(height: 8,),
-              Text( "Profile: $_msProfile"),
-              SizedBox(height: 8,),
-              Text( "Token: $_authToken"),
-            ],
-          ),
-        ),
-      )
-    );
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,  
+          children: [
+            Container(
+              child: Image.asset('assets/img/logo-utm.png'),
+            ),
+            // ElevatedButton( 
+            //   onPressed: _acquireTokenInteractively,
+            //   child: Text('Iniciar Sesión'),
+            //   style: ElevatedButton.styleFrom(
+            //     primary: appTheme.currentTheme.accentColor
+            //   ),
+            // ),
+            // ElevatedButton( 
+            //   onPressed: _signOut,
+            //   child: Text('Cerrar Sesión'),
+            //   style: ElevatedButton.styleFrom(
+            //     primary: appTheme.currentTheme.accentColor
+            //   ),
+            // ),
+            ElevatedButton( 
+              onPressed: _fetchMicrosoftProfile,
+              child: Text('Cargar Sesión'),
+              style: ElevatedButton.styleFrom(
+                primary: appTheme.currentTheme.accentColor
+              ),
+            ),
+            Text(_msProfile)
+          ],
+        )
+      );
   }
 }
