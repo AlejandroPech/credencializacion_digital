@@ -22,6 +22,9 @@ class _EventosPageState extends State<EventosPage> {
       child: Scaffold(
         appBar: AppBar(  
           title: Text('Eventos'),
+          actions: [
+            _PopupMenu()
+          ],
         ),
         drawer: MenuWidget(),
         body: _Paginas(),
@@ -31,6 +34,31 @@ class _EventosPageState extends State<EventosPage> {
   }
 }
 
+class _PopupMenu extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton(
+        itemBuilder: (context) => [
+          PopupMenuItem(
+            child: Text("Hoy"),
+            value: 1,
+          ),
+          PopupMenuItem(
+            child: Text("Esta semanda"),
+            value: 2,
+          ),
+          PopupMenuItem(
+            child: Text("Esta mes"),
+            value: 2,
+          ),
+          PopupMenuItem(
+            child: Text("Esta año"),
+            value: 2,
+          ),
+        ]
+    );
+  }
+}
 
 class _Paginas extends StatelessWidget {
   

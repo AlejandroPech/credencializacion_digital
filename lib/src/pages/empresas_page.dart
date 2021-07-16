@@ -1,4 +1,5 @@
 import 'package:credencializacion_digital/src/pages/empresa_cupon_page.dart';
+import 'package:credencializacion_digital/src/pages/empresa_cupones_page.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:credencializacion_digital/src/widgets/menu_widget.dart';
 
@@ -39,50 +40,62 @@ class _EmpresaPageState extends State<EmpresaPage> {
           Carditem(
               image: "https://media-cdn.tripadvisor.com/media/photo-s/08/af/e2/d3/distrito-capital-federal.jpg",
               color: appTheme.currentTheme.accentColor,
+              urlNavegar: EmpresaCuponPage.routeName,
           ),
           Carditem(
             image: "https://www.america-retail.com/static//2020/08/Noticia-5-1-de-3-339.png",
             color: appTheme.currentTheme.accentColor,
+            urlNavegar: EmpresaCuponesPage.routeName,
           ),
           Carditem(
               image: "https://media-cdn.tripadvisor.com/media/photo-s/08/af/e2/d3/distrito-capital-federal.jpg",
               color: appTheme.currentTheme.accentColor,
+              urlNavegar: EmpresaCuponPage.routeName,
           ),
           Carditem(
             image: "https://www.peru-retail.com/wp-content/uploads/Little-Caesars-1.jpg",
             color: appTheme.currentTheme.accentColor,
+            urlNavegar: EmpresaCuponPage.routeName,
           ),
           Carditem(
               image: "https://media-cdn.tripadvisor.com/media/photo-s/08/af/e2/d3/distrito-capital-federal.jpg",
               color: appTheme.currentTheme.accentColor,
+              urlNavegar: EmpresaCuponPage.routeName,
           ),
           Carditem(
             image: "https://www.america-retail.com/static//2020/08/Noticia-5-1-de-3-339.png",
             color: appTheme.currentTheme.accentColor,
+            urlNavegar: EmpresaCuponesPage.routeName,
           ),
           Carditem(
               image: "https://media-cdn.tripadvisor.com/media/photo-s/08/af/e2/d3/distrito-capital-federal.jpg",
               color: appTheme.currentTheme.accentColor,
+              urlNavegar: EmpresaCuponPage.routeName,
           ),
           Carditem(
             image: "https://www.peru-retail.com/wp-content/uploads/Little-Caesars-1.jpg",
             color: appTheme.currentTheme.accentColor,
+            urlNavegar: EmpresaCuponPage.routeName,
           ),
           Carditem(
               image: "https://media-cdn.tripadvisor.com/media/photo-s/08/af/e2/d3/distrito-capital-federal.jpg",
               color: appTheme.currentTheme.accentColor,
+              urlNavegar: EmpresaCuponesPage.routeName,
           ),
           Carditem(
             image: "https://www.america-retail.com/static//2020/08/Noticia-5-1-de-3-339.png",
             color: appTheme.currentTheme.accentColor,
+            urlNavegar: EmpresaCuponPage.routeName,
           ),
           Carditem(
               image: "https://media-cdn.tripadvisor.com/media/photo-s/08/af/e2/d3/distrito-capital-federal.jpg",
               color: appTheme.currentTheme.accentColor,
+              urlNavegar: EmpresaCuponPage.routeName,
           ),
           Carditem(
             image: "https://www.peru-retail.com/wp-content/uploads/Little-Caesars-1.jpg",
             color: appTheme.currentTheme.accentColor,
+            urlNavegar: EmpresaCuponPage.routeName,
           ),
         ],
       ),
@@ -93,8 +106,8 @@ class _EmpresaPageState extends State<EmpresaPage> {
 class Carditem extends StatelessWidget {
   final String image;
   final Color color;
-  const Carditem({Key key, @required this.image, @required this.color})
-      : super(key: key);
+  final String urlNavegar;
+  const Carditem({@required this.image, @required this.color,@required this.urlNavegar});
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +120,7 @@ class Carditem extends StatelessWidget {
               ),
               
               TextButton(
-                onPressed:()=>Navigator.pushNamed(context, EmpresaCuponPage.routeName),
+                onPressed:()=>Navigator.pushNamed(context, urlNavegar),
                 child: Text('Ver Cupones',style: TextStyle(color: this.color,fontSize: 18),),
               )
             ],

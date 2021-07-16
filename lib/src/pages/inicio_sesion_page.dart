@@ -85,18 +85,18 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
     final appTheme= Provider.of<ThemeChanger>(context);
     return Scaffold(
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,  
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,  
           children: [
             Container(
               child: Image.asset('assets/img/logo-utm.png'),
             ),
-            // ElevatedButton( 
-            //   onPressed: _acquireTokenInteractively,
-            //   child: Text('Iniciar Sesión'),
-            //   style: ElevatedButton.styleFrom(
-            //     primary: appTheme.currentTheme.accentColor
-            //   ),
-            // ),
+            ElevatedButton( 
+              onPressed: _acquireTokenInteractively,
+              child: Text('Iniciar Sesión'),
+              style: ElevatedButton.styleFrom(
+                primary: appTheme.currentTheme.accentColor
+              ),
+            ),
             // ElevatedButton( 
             //   onPressed: _signOut,
             //   child: Text('Cerrar Sesión'),
@@ -104,14 +104,13 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
             //     primary: appTheme.currentTheme.accentColor
             //   ),
             // ),
-            ElevatedButton( 
-              onPressed: _fetchMicrosoftProfile,
-              child: Text('Cargar Sesión'),
-              style: ElevatedButton.styleFrom(
-                primary: appTheme.currentTheme.accentColor
-              ),
-            ),
-            Text(_msProfile)
+            // ElevatedButton( 
+            //   onPressed: _fetchMicrosoftProfile,
+            //   child: Text('Cargar Sesión'),
+            //   style: ElevatedButton.styleFrom(
+            //     primary: appTheme.currentTheme.accentColor
+            //   ),
+            // ),
           ],
         )
       );

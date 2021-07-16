@@ -9,10 +9,6 @@ class ThemeChanger with ChangeNotifier{
       primaryColor: Color(0xff00AB78),
       primaryColorLight: Colors.black,
       bottomAppBarColor: Color(0xff00AB78),
-      textTheme: TextTheme(
-        bodyText1: TextStyle( color: Colors.black ),
-        bodyText2: TextStyle( color: Colors.black ),
-      ),
     );
   SystemUiOverlayStyle _styleBlack = SystemUiOverlayStyle(
     systemNavigationBarDividerColor: Colors.black,

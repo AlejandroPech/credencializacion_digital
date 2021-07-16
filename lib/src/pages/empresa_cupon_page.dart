@@ -17,49 +17,74 @@ class _EmpresaCuponPageState extends State<EmpresaCuponPage> {
   @override
   Widget build(BuildContext context) {
     final size= MediaQuery.of(context).size;
-    final appTheme= Provider.of<ThemeChanger>(context);
+    
     return Scaffold(
       
       body: SafeArea(
         child: ListView(
           children: [
-            Container(
-              height: size.height / 4,
-              decoration: BoxDecoration( 
-                image:DecorationImage( 
-                  fit: BoxFit.cover,
-                  image: NetworkImage('https://media-cdn.tripadvisor.com/media/photo-s/08/af/e2/d3/distrito-capital-federal.jpg')
-                )
-              ),
-            ),
-            _Usuario(size: size),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal:10 ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  textoPropiedad(titulo: 'Empresa',cuerpo: 'Burger King'),
-                  textoPropiedad(titulo: 'Fecha de vencimiento del cupón',cuerpo: DateTime(2021,8,9).toString()),
-                  textoPropiedad(titulo: 'Porcentaje de descuento',cuerpo: '25'),
-                ],
-              ),
-            ),
-            Center(
-              child: ElevatedButton(
-                onPressed: (){},
-                child: Text('Aplicar Cupón'),
-                style: ElevatedButton.styleFrom(
-                   primary: appTheme.currentTheme.accentColor
-                ),
-              ),
-            )
-            
+            _ImagenAndButtonBack(size: size),
+            _Usuario(size: size),            
+            _Cuerpo(),  
           ],
         ),
       ),
     );
   }
+}
 
+class _ImagenAndButtonBack extends StatelessWidget {
+  const _ImagenAndButtonBack({
+    @required this.size,
+  });
+
+  final Size size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children:[
+        Container(
+          height: size.height / 4,
+          decoration: BoxDecoration( 
+            image:DecorationImage( 
+              fit: BoxFit.cover,
+              image: NetworkImage('https://media-cdn.tripadvisor.com/media/photo-s/08/af/e2/d3/distrito-capital-federal.jpg')
+            )
+          ),
+        ),
+        SafeArea(
+          child: BackButton(),
+        ),
+      ],
+    );
+  }
+}
+class _Cuerpo extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final appTheme= Provider.of<ThemeChanger>(context);
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal:10 ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          textoPropiedad(titulo: 'Empresa',cuerpo: 'Burger King'),
+          textoPropiedad(titulo: 'Fecha de vencimiento del cupón',cuerpo: DateTime(2021,8,9).toString()),
+          textoPropiedad(titulo: 'Porcentaje de descuento',cuerpo: '25'),
+          Center(
+            child: ElevatedButton(
+              onPressed: (){},
+              child: Text('Aplicar Cupón'),
+              style: ElevatedButton.styleFrom(
+                  primary: appTheme.currentTheme.accentColor
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
   Widget textoPropiedad(
     {
       @required String titulo,
