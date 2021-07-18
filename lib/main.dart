@@ -1,4 +1,3 @@
-import 'package:credencializacion_digital/src/services/microsoft_service.dart';
 import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +20,6 @@ void main() async{
      MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => new ThemeChanger(prefs.theme),),
-        ChangeNotifierProvider(create: (_)=>new MicrosoftService()),
       ],
       child: MyApp()
     )

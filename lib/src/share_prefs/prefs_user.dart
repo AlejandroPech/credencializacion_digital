@@ -23,4 +23,20 @@ class PrefUser{
   set theme(int value){
     _prefs.setInt('theme', value);
   }
+
+  String get tokenMicrosoft{
+    return _prefs.getString('tokenMicrosoft')??'';
+  }
+
+  set tokenMicrosoft(String value){
+    _prefs.setString('tokenMicrosoft', value);
+  }
+
+  bool get inicioSesion{
+    return _prefs.getBool('inicioSesion')?? false;
+  }
+
+  set inicioSesion(bool value){
+    _prefs.setBool('inicioSesion', value);
+  }
 }

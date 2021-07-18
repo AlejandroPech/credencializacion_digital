@@ -1,6 +1,7 @@
 
 import 'package:credencializacion_digital/src/models/Usuario.dart';
 import 'package:credencializacion_digital/src/pages/inicio_sesion_page.dart';
+import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:credencializacion_digital/src/widgets/menu_widget.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class CredencialPage extends StatefulWidget {
 }
 
 class _CredencialPageState extends State<CredencialPage> {
+  final prefUser = PrefUser();
   final usuario= new Usuario(
     matricula: 19090529,
     nombre: 'Jesus Alejandro',
@@ -46,12 +48,12 @@ class _CredencialPageState extends State<CredencialPage> {
     );
   }
   Future<void> _signOut() async {
-    String authToken;
     try {
-      authToken = await this.fma.signOut;
+      await this.fma.signOut;
+      prefUser.tokenMicrosoft='';
+      prefUser.inicioSesion=false;
       Navigator.pushReplacementNamed(context, InicioSesionPage.routeName);
     } on PlatformException catch(e) {
-      authToken = 'Failed to sign out.';
       print(e.message);
     }
   }
