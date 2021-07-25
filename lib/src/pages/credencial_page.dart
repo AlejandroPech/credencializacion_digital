@@ -1,11 +1,13 @@
+import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:credencializacion_digital/src/models/Usuario.dart';
 import 'package:credencializacion_digital/src/pages/inicio_sesion_page.dart';
+import 'package:credencializacion_digital/src/services/microsoft_service.dart';
 import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:credencializacion_digital/src/widgets/menu_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_microsoft_authentication/flutter_microsoft_authentication.dart';
 import 'package:meta/meta.dart';
 import 'package:provider/provider.dart';
@@ -21,25 +23,13 @@ class CredencialPage extends StatefulWidget {
 }
 
 class _CredencialPageState extends State<CredencialPage> {
-  final prefUser = PrefUser();
-  final usuario= new Usuario(
-    matricula: 19090529,
-    nombre: 'Jesus Alejandro',
-    apellidoP: 'Pech',
-    apellidoM: 'Paredes',
-    correoInstitucional: '19090529@alumno.utmetropolitana.edu.mx',
-    grado: 6, 
-    grupo: 'A',
-    carrera: 'Desarrollo de Software Multiplataforma',
-    division: 'TIC',
-    status: 'Alumno',
-    fotografia: 'https://image.freepik.com/vector-gratis/hombre-muestra-gesto-gran-idea_10045-637.jpg'
-  );
+
+  MicrosoftService microsoftService= new MicrosoftService();
   FlutterMicrosoftAuthentication fma;
+
   @override
   void initState() {
     super.initState();
-
     fma = FlutterMicrosoftAuthentication(
       kClientID: "86614fe5-8390-4852-b473-7aac5bf50548",
       kAuthority: "https://login.microsoftonline.com/organizations",
@@ -47,50 +37,63 @@ class _CredencialPageState extends State<CredencialPage> {
       androidConfigAssetPath: "assets/auth_config.json"
     );
   }
-  Future<void> _signOut() async {
-    try {
-      await this.fma.signOut;
-      prefUser.tokenMicrosoft='';
-      prefUser.inicioSesion=false;
-      Navigator.pushReplacementNamed(context, InicioSesionPage.routeName);
-    } on PlatformException catch(e) {
-      print(e.message);
-    }
-  }
+
   @override
   Widget build(BuildContext context) {
     final size=MediaQuery.of(context).size;
     final appTheme= Provider.of<ThemeChanger>(context);
+    final prefUser = PrefUser();
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+                title: Text(widget.title),
+              ),
+              drawer: MenuWidget(),
+      body: FutureBuilder(
+        future: microsoftService.fetchMicrosoftProfile(fma),
+        builder: (BuildContext context,AsyncSnapshot<Usuario> snapshot){
+          if(snapshot.hasData){
+            return Scaffold(
+              
+              body: ListView(
+                
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+                    child: _InfoGeneral(size: size,user: snapshot.data),
+                  ),
+                  SizedBox(height: 20),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: _InfoAcademica(user: snapshot.data,),
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: ElevatedButton(
+                      onPressed:()async{
+                        await microsoftService.signOut(fma);
+                        if(prefUser.inicioSesion==false){
+                          Navigator.pushReplacementNamed(context, InicioSesionPage.routeName);
+                          
+                        }
+                      },
+                      child: Text("Cerrar sesión"),
+                      style: ElevatedButton.styleFrom(
+                        primary:appTheme.currentTheme.accentColor
+                      ),
+                    ),
+                  )
+                  
+                ],
+              )
+            );
+          }
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
       ),
-      drawer: MenuWidget(),
-      body: ListView( 
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 20,vertical: 10),
-            child: _InfoGeneral(size: size,user: usuario),
-          ),
-          SizedBox(height: 20),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: _InfoAcademica(user: usuario,),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: ElevatedButton(
-            onPressed: _signOut,
-             child: Text("Cerrar sesión"),
-             style: ElevatedButton.styleFrom(
-               primary:appTheme.currentTheme.accentColor
-             ),
-          ),
-          )
-          
-        ],
-      )
     );
+    
   }
 }
 
@@ -113,11 +116,11 @@ class _InfoGeneral extends StatelessWidget {
           children: [
             Container(
               margin: EdgeInsets.symmetric(vertical: 20),
-              child: CircleAvatar(radius: size.width/5, backgroundImage: NetworkImage(user.fotografia)),
+              child: CircleAvatar(radius: size.width/5, backgroundImage: MemoryImage(user.foto)),
             )
           ],
         ),
-        textoDato(titulo: 'Nombre', cuerpo: '${user.nombre} ${user.apellidoP} ${user.apellidoM}')
+        textoDato(titulo: 'Nombre', cuerpo: '${user.nombre}')
       ],
     );
   }
@@ -131,7 +134,7 @@ class _InfoGeneral extends StatelessWidget {
     children: [
       Text(titulo,style: TextStyle(fontSize: 16),),
       SizedBox(height: 2),
-      Text(cuerpo,style: TextStyle(fontSize: 20),),
+      Text(cuerpo,style: TextStyle(fontSize: 20,),),
       SizedBox(height: 15)
     ] ,
   );
@@ -149,12 +152,12 @@ class _InfoAcademica extends StatelessWidget {
       children: [
         Text('Datos Academicos',style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold),),
         SizedBox(height: 10),
-        textoDato(titulo: 'Mátricula', cuerpo: user.matricula.toString()),
+        // textoDato(titulo: 'Mátricula', cuerpo: user.matricula.toString()),
         textoDato(titulo: 'Correo Institucional', cuerpo: user.correoInstitucional),
-        textoDato(titulo: 'Grado y Grupo', cuerpo: '${user.grado.toString()} ${user.grupo}'),
-        textoDato(titulo: 'División', cuerpo: user.division),
-        textoDato(titulo: 'Carrera', cuerpo: user.carrera),
-        textoDato(titulo: 'status', cuerpo: user.status),
+        // textoDato(titulo: 'Grado y Grupo', cuerpo: '${user.grado.toString()} ${user.grupo}'),
+        // textoDato(titulo: 'División', cuerpo: user.division),
+        // textoDato(titulo: 'Carrera', cuerpo: user.carrera),
+        textoDato(titulo: 'status', cuerpo: user.titulo),
       ],
     );
   }

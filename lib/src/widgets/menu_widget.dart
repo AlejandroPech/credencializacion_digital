@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:credencializacion_digital/src/pages/evento_page.dart';
 import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
@@ -19,10 +21,8 @@ class MenuWidget extends StatelessWidget {
         child: ListView(  
           children: [
             buildHeader(
-              email: '19090529',
-              name: 'Jesus Alejandro Pech Paredes',
+              name: prefUser.nombreUsuario,
               onClicked:()=>Navigator.pushReplacementNamed(context, CredencialPage.routeName),
-              urlImage: urlImage
             ),
             ListTile(
               leading: Icon(Icons.business,color: appTheme.currentTheme.accentColor,),
@@ -57,9 +57,7 @@ class MenuWidget extends StatelessWidget {
     );
   }
   Widget buildHeader({
-    @required String urlImage,
     @required String name,
-    @required String email,
     @required VoidCallback onClicked,
   }) =>
       InkWell(
@@ -68,22 +66,15 @@ class MenuWidget extends StatelessWidget {
           padding: EdgeInsets.symmetric(vertical: 40),
           child: Row(
             children: [
-              CircleAvatar(radius: 30, backgroundImage: NetworkImage(urlImage)),
+              CircleAvatar(radius: 30, backgroundImage: MemoryImage(Uint8List.fromList(prefUser.imagenUsuario.codeUnits))),
               SizedBox(width: 20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name.substring(0,20),
-                    style: TextStyle(fontSize: 20),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    email,
-                    style: TextStyle(fontSize: 14),
-                  ),
-                ],
+              Expanded(
+                child:Text(
+                      name,
+                      style: TextStyle(fontSize: 16),
+                  ), 
               ),
+              
             ],
           ),
         ),

@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PrefUser{
@@ -38,5 +41,30 @@ class PrefUser{
 
   set inicioSesion(bool value){
     _prefs.setBool('inicioSesion', value);
+  }
+
+  DateTime get inicioToken{
+    String fecha=_prefs.getString('inicioToken')??DateTime.now().toString();
+    return DateTime.parse(fecha);
+  }
+
+  set inicioToken(DateTime value){
+    _prefs.setString('inicioToken', value.toString());
+  }
+
+  String get imagenUsuario{
+    return _prefs.getString('imagenUsuario')??'';
+  }
+
+  set imagenUsuario(String value){
+    _prefs.setString('imagenUsuario', value);
+  }
+
+  String get nombreUsuario{
+    return _prefs.getString('nombreUsuario')??'';
+  }
+  
+  set nombreUsuario(String value){
+    _prefs.setString('nombreUsuario', value);
   }
 }
