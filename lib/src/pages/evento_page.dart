@@ -113,7 +113,7 @@ class _NavegacionModel with ChangeNotifier{
   int get paginaActual=>this._paginaActual;
   set paginaActual(int value){
     this._paginaActual=value;
-    _pageController.animateToPage(value, duration: Duration(milliseconds: 500), curve: Curves.easeOut);
+    _pageController.animateToPage(value, duration: Duration(milliseconds: 250), curve: Curves.easeOut);
     notifyListeners();
   }
 

@@ -1,7 +1,6 @@
 
 import 'dart:convert';
 import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:credencializacion_digital/src/models/Usuario.dart';
 import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
@@ -14,7 +13,6 @@ class MicrosoftService{
   String imagenUsuario = "https://graph.microsoft.com/v1.0/me/photo/\$value";
   String perfilUsuario = "https://graph.microsoft.com/v1.0/me/";
   String _authToken = '';
-  String _msProfile = 'Unknown Profile';
   final prefUser = PrefUser();
 
   Future<void> acquireTokenInteractively(FlutterMicrosoftAuthentication fma) async {

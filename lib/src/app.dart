@@ -1,4 +1,3 @@
-import 'package:credencializacion_digital/src/models/Eventos.dart';
 import 'package:credencializacion_digital/src/pages/credencial_page.dart';
 import 'package:credencializacion_digital/src/pages/empresa_cupon_page.dart';
 import 'package:credencializacion_digital/src/pages/empresa_cupones_page.dart';
