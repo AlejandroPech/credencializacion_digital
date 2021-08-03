@@ -1,15 +1,15 @@
-import 'package:credencializacion_digital/src/models/Eventos.dart';
+import 'package:credencializacion_digital/src/models/Evento.dart';
+import 'package:credencializacion_digital/src/services/eventos_service.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:meta/meta.dart';
 
-class TabPaginaEventos extends StatelessWidget {
-  const TabPaginaEventos({
+class ListaEventos extends StatelessWidget {
+  const ListaEventos({
     @required this.eventos,
   });
 
-  final List<Eventos> eventos;
+  final List<Evento> eventos;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class TabPaginaEventos extends StatelessWidget {
 }
 
 class _Evento extends StatelessWidget {
-  final Eventos evento;
+  final Evento evento;
   final int index;
 
   const _Evento({@required this.evento,@required this.index});
@@ -49,7 +49,7 @@ class _Evento extends StatelessWidget {
 }
 
 class _TarjetaTitulo extends StatelessWidget {
-  final Eventos evento;
+  final Evento evento;
 
   const _TarjetaTitulo({@required this.evento});
   
@@ -63,7 +63,7 @@ class _TarjetaTitulo extends StatelessWidget {
 }
 
 class _TarjetaImagen extends StatelessWidget {
-  final Eventos evento;
+  final Evento evento;
   const _TarjetaImagen({@required this.evento});
 
   @override
@@ -71,9 +71,9 @@ class _TarjetaImagen extends StatelessWidget {
     return Container(
       child: ClipRRect(
         borderRadius: BorderRadius.only(topLeft: Radius.circular(50),bottomRight: Radius.circular(50)),
-        child: (evento.urlImage.isNotEmpty)? FadeInImage(
+        child: (evento.urlImagen.isNotEmpty)? FadeInImage(
             placeholder: AssetImage('assets/img/giphy.gif'),
-            image: NetworkImage(evento.urlImage),
+            image: NetworkImage(evento.urlImagen),
           ):Image(image: AssetImage('assets/img/no-image.png'),)
         
       ),
@@ -82,7 +82,7 @@ class _TarjetaImagen extends StatelessWidget {
 }
 
 class _TarjetaCuerpo extends StatelessWidget {
-  final Eventos evento;
+  final Evento evento;
 
   const _TarjetaCuerpo({@required this.evento});
 
@@ -93,8 +93,8 @@ class _TarjetaCuerpo extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(evento.departamento,style: TextStyle(fontSize: 22),),
-          Text(evento.cuerpo,style: TextStyle(fontSize: 20),),
+          Text(evento.autor.nombre,style: TextStyle(fontSize: 22),),
+          Text(evento.contenido,style: TextStyle(fontSize: 20),),
         ],
       ),
     );
@@ -102,21 +102,26 @@ class _TarjetaCuerpo extends StatelessWidget {
 }
 
 class _TarjetaBotones extends StatelessWidget {
-  final Eventos evento;
+  final Evento evento;
 
   const _TarjetaBotones({@required this.evento});
 
   @override
   Widget build(BuildContext context) {
     final appTheme= Provider.of<ThemeChanger>(context).currentTheme;
+    final eventoService = Provider.of<EventosService>(context);
     return Container(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            child:(evento.meGusta)?Icon(Icons.favorite,color: appTheme.accentColor,):Icon(Icons.favorite)
+          GestureDetector(
+            onTap: (){
+              eventoService.getEvents();
+              print('hey');
+            },
+            child:(evento.eventosFavoritos.any((element) => element.favorito.matricula=='123456789'))?Icon(Icons.favorite,color: appTheme.accentColor,):Icon(Icons.favorite)
           ),
-          Text(evento.fechaEvento.toString())
+          Text(evento.fechaInicio.toString())
         ],
       ),
     );

@@ -2,7 +2,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:credencializacion_digital/src/models/Usuario.dart';
+import 'package:credencializacion_digital/src/models/Alumno.dart';
 import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_microsoft_authentication/flutter_microsoft_authentication.dart';
@@ -58,18 +58,12 @@ class MicrosoftService{
     return username;
   }
 
-  Future<Usuario> fetchMicrosoftProfile(FlutterMicrosoftAuthentication fma) async {
+  Future<Alumno> fetchMicrosoftProfile(FlutterMicrosoftAuthentication fma) async {
     final token=await loadToken(fma);
     var response = await http.get(Uri.parse(perfilUsuario), headers: {
       "Authorization": "Bearer " + token
     });
-    final json=jsonDecode(response.body);
-    final Usuario usuario = new Usuario(
-      nombre: json['displayName'],
-      titulo: json['jobTitle'],
-      correoInstitucional: json['mail'],
-      foto: Uint8List.fromList(prefUser.imagenUsuario.codeUnits)
-    );
+    final usuario=alumnoResponse(response.body,prefUser.imagenUsuario);
     return usuario;
   }
   guardarImagen(FlutterMicrosoftAuthentication fma)async{
@@ -89,6 +83,7 @@ class MicrosoftService{
     });
     final json=jsonDecode(response.body);
     prefUser.nombreUsuario=json['displayName'];
+    prefUser.identificadorUsuario=json['mail'].toString().substring(0,8);
   }
 
   Future<String> loadToken(FlutterMicrosoftAuthentication fma)async{

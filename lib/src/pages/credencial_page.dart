@@ -1,4 +1,4 @@
-import 'package:credencializacion_digital/src/models/Usuario.dart';
+import 'package:credencializacion_digital/src/models/Alumno.dart';
 import 'package:credencializacion_digital/src/pages/inicio_sesion_page.dart';
 import 'package:credencializacion_digital/src/services/microsoft_service.dart';
 import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
@@ -38,59 +38,67 @@ class _CredencialPageState extends State<CredencialPage> {
   @override
   Widget build(BuildContext context) {
     final size=MediaQuery.of(context).size;
-    final appTheme= Provider.of<ThemeChanger>(context);
+    final appTheme= Provider.of<ThemeChanger>(context).currentTheme;
     final prefUser = PrefUser();
     return Scaffold(
-      appBar: AppBar(
-                title: Text(widget.title),
-              ),
-              drawer: MenuWidget(),
-      body: FutureBuilder(
-        future: microsoftService.fetchMicrosoftProfile(fma),
-        builder: (BuildContext context,AsyncSnapshot<Usuario> snapshot){
-          if(snapshot.hasData){
-            return Scaffold(
-              
-              body: ListView(
-                
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20,vertical: 10),
-                    child: _InfoGeneral(size: size,user: snapshot.data),
-                  ),
-                  SizedBox(height: 20),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: _InfoAcademica(user: snapshot.data,),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: ElevatedButton(
-                      onPressed:()async{
-                        await microsoftService.signOut(fma);
-                        if(prefUser.inicioSesion==false){
-                          Navigator.pushReplacementNamed(context, InicioSesionPage.routeName);
-                          
-                        }
-                      },
-                      child: Text("Cerrar sesión"),
-                      style: ElevatedButton.styleFrom(
-                        primary:appTheme.currentTheme.accentColor
-                      ),
-                    ),
-                  )
-                  
-                ],
-              )
+      drawer: MenuWidget(),
+      
+      body: Container(
+        decoration: BoxDecoration( 
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            stops: [0.01,0.6],
+            colors: [appTheme.accentColor,appTheme.scaffoldBackgroundColor]
+          )
+        ),
+        child: FutureBuilder(
+          future: microsoftService.fetchMicrosoftProfile(fma),
+          builder: (BuildContext context,AsyncSnapshot<Alumno> snapshot){
+            if(snapshot.hasData){
+              return Container(
+                margin: EdgeInsets.symmetric(horizontal: 10),
+                child: ListView(
+                  children: [
+                    _AppBar(),
+                    _InfoGeneral(size: size,user: snapshot.data),
+                    SizedBox(height: 10),
+                    _InfoAcademica(user: snapshot.data,),
+                    _BotonCerrarSesion(microsoftService: microsoftService, fma: fma, prefUser: prefUser, appTheme: appTheme)
+                  ],
+                ),
+              );
+            }
+            return Center(
+              child: CircularProgressIndicator(),
             );
           }
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
+        ),
       ),
     );
-    
+  }
+}
+
+class _AppBar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 10),
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: (){
+                Scaffold.of(context).openDrawer();
+              },
+              child: Icon(Icons.menu),
+            ),
+            SizedBox(width: 20,),
+            Expanded(child: Text('Credenical Digital',style: TextStyle(fontSize: 24,),maxLines: 1,))
+          ],
+        ),
+      )
+    );
   }
 }
 
@@ -101,60 +109,44 @@ class _InfoGeneral extends StatelessWidget {
   });
 
   final Size size;
-  final Usuario user;
+  final Alumno user;
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Datos Generales',style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold),),
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
+            Center(child: Image.asset('assets/img/logo-utm.png',width: size.width/2,height:size.height/5,)),
             Container(
               margin: EdgeInsets.symmetric(vertical: 20),
               child: CircleAvatar(radius: size.width/5, backgroundImage: MemoryImage(user.foto)),
-            )
+            ),
           ],
         ),
-        textoDato(titulo: 'Nombre', cuerpo: '${user.nombre}')
       ],
     );
   }
-  Widget textoDato(
-    {
-      @required String titulo,
-      @required String cuerpo
-    }
-  )=>Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(titulo,style: TextStyle(fontSize: 16),),
-      SizedBox(height: 2),
-      Text(cuerpo,style: TextStyle(fontSize: 20,),),
-      SizedBox(height: 15)
-    ] ,
-  );
 }
 
 class _InfoAcademica extends StatelessWidget {
   const _InfoAcademica({
     @required this.user,
   });
-  final Usuario user;
+  final Alumno user;
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Datos Academicos',style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold),),
+        Text('Información',style: TextStyle(fontSize: 28,fontWeight: FontWeight.bold),),
         SizedBox(height: 10),
-        // textoDato(titulo: 'Mátricula', cuerpo: user.matricula.toString()),
+        textoDato(titulo: 'Nombre', cuerpo: user.nombre),
+        textoDato(titulo: 'Matricula', cuerpo: user.matricula),
         textoDato(titulo: 'Correo Institucional', cuerpo: user.correoInstitucional),
-        // textoDato(titulo: 'Grado y Grupo', cuerpo: '${user.grado.toString()} ${user.grupo}'),
-        // textoDato(titulo: 'División', cuerpo: user.division),
-        // textoDato(titulo: 'Carrera', cuerpo: user.carrera),
         textoDato(titulo: 'status', cuerpo: user.titulo),
+        textoDato(titulo: 'Dirección de la Universidad', cuerpo: 'Calle 111 número 315, Santa Rosa, 97279 Mérida, Yuc.'),
       ],
     );
   }
@@ -172,4 +164,37 @@ class _InfoAcademica extends StatelessWidget {
       SizedBox(height: 15)
     ] ,
   );
+}
+
+class _BotonCerrarSesion extends StatelessWidget {
+  const _BotonCerrarSesion({
+    Key key,
+    @required this.microsoftService,
+    @required this.fma,
+    @required this.prefUser,
+    @required this.appTheme,
+  }) : super(key: key);
+
+  final MicrosoftService microsoftService;
+  final FlutterMicrosoftAuthentication fma;
+  final PrefUser prefUser;
+  final ThemeData appTheme;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: ElevatedButton(
+        onPressed:()async{
+          await microsoftService.signOut(fma);
+          if(prefUser.inicioSesion==false){
+            Navigator.pushReplacementNamed(context, InicioSesionPage.routeName);
+          }
+        },
+        child: Text("Cerrar sesión"),
+        style: ElevatedButton.styleFrom(
+          primary:appTheme.accentColor
+        ),
+      ),
+    );
+  }
 }

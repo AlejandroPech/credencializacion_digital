@@ -1,5 +1,5 @@
-import 'package:credencializacion_digital/src/models/Eventos.dart';
-import 'package:credencializacion_digital/src/pages/tab_evento_page.dart';
+import 'package:credencializacion_digital/src/pages/tab_eventos_page.dart';
+import 'package:credencializacion_digital/src/pages/tab_favoritos_page.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:credencializacion_digital/src/widgets/menu_widget.dart';
 import 'package:flutter/material.dart';
@@ -20,13 +20,10 @@ class _EventosPageState extends State<EventosPage> {
     return ChangeNotifierProvider(
       create: (_)=>new _NavegacionModel(),
       child: Scaffold(
-        appBar: AppBar(  
-          title: Text('Eventos'),
-          actions: [
-            _PopupMenu()
-          ],
-        ),
         drawer: MenuWidget(),
+        appBar: AppBar(
+          title:Text('Eventos y Favoritos')
+        ),
         body: _Paginas(),
         bottomNavigationBar: _Navegacion(),
       ),
@@ -34,55 +31,19 @@ class _EventosPageState extends State<EventosPage> {
   }
 }
 
-class _PopupMenu extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton(
-        itemBuilder: (context) => [
-          PopupMenuItem(
-            child: Text("Hoy"),
-            value: 1,
-          ),
-          PopupMenuItem(
-            child: Text("Esta semanda"),
-            value: 2,
-          ),
-          PopupMenuItem(
-            child: Text("Esta mes"),
-            value: 2,
-          ),
-          PopupMenuItem(
-            child: Text("Esta año"),
-            value: 2,
-          ),
-        ]
-    );
-  }
-}
-
 class _Paginas extends StatelessWidget {
   
-  final eventos=[
-    Eventos(eventoId: 1, urlImage: 'https://www.yucatanencorto.com/noticias/wp-content/uploads/2019/11/IMG_20191108_105257.jpg', titulo: 'Titulo Ejemplo 1', cuerpo: 'Este es un ejemplo para observar las interfaces', fechaEvento: DateTime(2021), meGusta: true, departamento: 'TIC', recomendado:true),
-    Eventos(eventoId: 2, urlImage: 'https://www.yucatanencorto.com/noticias/wp-content/uploads/2019/11/IMG_20191108_105257.jpg', titulo: 'Titulo Ejemplo 2', cuerpo: 'Este es un ejemplo para observar las interfaces', fechaEvento: DateTime(2021), meGusta: false, departamento: 'TIC', recomendado:true),
-    Eventos(eventoId: 3, urlImage: 'https://www.yucatanencorto.com/noticias/wp-content/uploads/2019/11/IMG_20191108_105257.jpg', titulo: 'Titulo Ejemplo 3', cuerpo: 'Este es un ejemplo para observar las interfaces', fechaEvento: DateTime(2021), meGusta: false, departamento: 'TIC', recomendado:true),
-    Eventos(eventoId: 4, urlImage: '', titulo: 'Titulo Ejemplo 4', cuerpo: 'Este es un ejemplo para observar las interfaces', fechaEvento: DateTime(2021), meGusta: false, departamento: 'TIC', recomendado:true),
-    Eventos(eventoId: 5, urlImage: 'https://www.yucatanencorto.com/noticias/wp-content/uploads/2019/11/IMG_20191108_105257.jpg', titulo: 'Titulo Ejemplo 5', cuerpo: 'Este es un ejemplo para observar las interfaces', fechaEvento: DateTime(2021), meGusta: true, departamento: 'TIC', recomendado:true),
-  ];
-  final favoritos=[
-    Eventos(eventoId: 1, urlImage: 'https://www.yucatanencorto.com/noticias/wp-content/uploads/2019/11/IMG_20191108_105257.jpg', titulo: 'Titulo Ejemplo 1', cuerpo: 'Este es un ejemplo para observar las interfaces', fechaEvento: DateTime(2021), meGusta: true, departamento: 'TIC', recomendado:true),
-    Eventos(eventoId: 5, urlImage: 'https://www.yucatanencorto.com/noticias/wp-content/uploads/2019/11/IMG_20191108_105257.jpg', titulo: 'Titulo Ejemplo 5', cuerpo: 'Este es un ejemplo para observar las interfaces', fechaEvento: DateTime(2021), meGusta: true, departamento: 'TIC', recomendado:true),
-  ];
   @override
   Widget build(BuildContext context) {
     final navegacionModel=Provider.of<_NavegacionModel>(context);
+    
     return PageView(
       controller:navegacionModel.pageController,
       // physics: BouncingScrollPhysics(),
       physics: NeverScrollableScrollPhysics(),
       children: <Widget>[
-        TabPaginaEventos(eventos: eventos),
-        TabPaginaEventos(eventos: favoritos),
+        TabPaginaEventos(),
+        TabPaginaFavoritos(),
       ],
     );
   }
@@ -113,7 +74,7 @@ class _NavegacionModel with ChangeNotifier{
   int get paginaActual=>this._paginaActual;
   set paginaActual(int value){
     this._paginaActual=value;
-    _pageController.animateToPage(value, duration: Duration(milliseconds: 250), curve: Curves.easeOut);
+    _pageController.animateToPage(value, duration: Duration(milliseconds: 500), curve: Curves.easeOut);
     notifyListeners();
   }
 

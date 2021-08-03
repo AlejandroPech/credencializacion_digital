@@ -42,11 +42,6 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
   @override
   Widget build(BuildContext context) {
     final appTheme= Provider.of<ThemeChanger>(context);
-    if(prefUser.inicioSesion){
-      Future.microtask(() {
-        Navigator.pushReplacementNamed(context, EmpresaPage.routeName);
-      });
-    }
     return FutureBuilder(
       future: cuentaIniciada(),
       builder: (BuildContext context,AsyncSnapshot snapshot){
