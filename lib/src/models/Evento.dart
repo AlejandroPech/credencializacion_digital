@@ -1,4 +1,4 @@
-import 'package:credencializacion_digital/src/models/EventoFavorito.dart';
+import 'package:credencializacion_digital/src/models/Favorito.dart';
 import 'package:meta/meta.dart';
 import 'dart:convert';
 
@@ -26,7 +26,7 @@ class Evento{
   bool esActivo;
   bool esSugerido;
   bool esPublicado;
-  List<EventoFavorito> eventosFavoritos;
+  List<Favorito> favoritos;
   Evento({
     @required this.eventoId,
     @required this.titulo,
@@ -38,7 +38,7 @@ class Evento{
     @required this.esActivo,
     @required this.esSugerido,
     @required this.esPublicado,
-    @required this.eventosFavoritos,
+    @required this.favoritos,
   });
 
   factory Evento.fromJson(Map<String,dynamic> json)=>Evento(
@@ -49,10 +49,11 @@ class Evento{
     fechaFinal: DateTime.parse(json['endDate'])??DateTime.now(),
     autor:Autor.fromJson(json['author'])??Autor(idAutor: 0, nombre: ''),
     urlImagen: json['image']??'',
-    esActivo: json['isActive']??false,
+    esActivo: json['isActivity']??false,
     esSugerido: json['isSuggest']??false,
     esPublicado: json['isPublished']??false,
-    eventosFavoritos: List<EventoFavorito>.from(json['eventFavorite'].map((x) => EventoFavorito.fromJson(x)))
+    // favoritos: List<Favorito>.from(json['eventFavorite'].map((x) => Favorito.fromJson(x))),
+    favoritos: [],
   );
 }
 
@@ -66,6 +67,6 @@ class Autor{
 
   factory Autor.fromJson(Map<String,dynamic> json)=>Autor(
     idAutor: json['id']??0,
-    nombre: json['name']??'',
+    nombre: json['nombre']??'',
   );
 }

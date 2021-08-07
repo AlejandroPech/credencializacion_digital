@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:credencializacion_digital/src/models/Evento.dart';
 import 'package:credencializacion_digital/src/services/eventos_service.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 class ListaEventos extends StatelessWidget {
   const ListaEventos({
@@ -73,7 +76,7 @@ class _TarjetaImagen extends StatelessWidget {
         borderRadius: BorderRadius.only(topLeft: Radius.circular(50),bottomRight: Radius.circular(50)),
         child: (evento.urlImagen.isNotEmpty)? FadeInImage(
             placeholder: AssetImage('assets/img/giphy.gif'),
-            image: NetworkImage(evento.urlImagen),
+            image: MemoryImage(base64Decode(evento.urlImagen)),
           ):Image(image: AssetImage('assets/img/no-image.png'),)
         
       ),
@@ -94,7 +97,8 @@ class _TarjetaCuerpo extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(evento.autor.nombre,style: TextStyle(fontSize: 22),),
-          Text(evento.contenido,style: TextStyle(fontSize: 20),),
+          Html(data: evento.contenido),
+          // Text(evento.contenido,style: TextStyle(fontSize: 20),),
         ],
       ),
     );
@@ -119,7 +123,7 @@ class _TarjetaBotones extends StatelessWidget {
               eventoService.getEvents();
               print('hey');
             },
-            child:(evento.eventosFavoritos.any((element) => element.favorito.matricula=='123456789'))?Icon(Icons.favorite,color: appTheme.accentColor,):Icon(Icons.favorite)
+            child:(evento.favoritos.any((element) => element.matricula=='123456789'))?Icon(Icons.favorite,color: appTheme.accentColor,):Icon(Icons.favorite)
           ),
           Text(evento.fechaInicio.toString())
         ],

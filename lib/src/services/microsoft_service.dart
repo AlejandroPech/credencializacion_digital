@@ -1,6 +1,5 @@
 
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:credencializacion_digital/src/models/Alumno.dart';
 import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
