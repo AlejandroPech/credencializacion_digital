@@ -1,4 +1,4 @@
-import 'package:credencializacion_digital/src/models/Evento.dart';
+import 'package:credencializacion_digital/src/models/EventoModel.dart';
 import 'package:meta/meta.dart';
 
 class Favorito{

@@ -5,16 +5,9 @@ import 'package:credencializacion_digital/src/widgets/menu_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class EventosPage extends StatefulWidget {
+
+class EventosPage extends StatelessWidget{
   static final routeName='eventos';
-  EventosPage({Key key}) : super(key: key);
-
-  @override
-  _EventosPageState createState() => _EventosPageState();
-}
-
-class _EventosPageState extends State<EventosPage> {
-  
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -73,9 +66,11 @@ class _NavegacionModel with ChangeNotifier{
 
   int get paginaActual=>this._paginaActual;
   set paginaActual(int value){
-    this._paginaActual=value;
-    _pageController.animateToPage(value, duration: Duration(milliseconds: 500), curve: Curves.easeOut);
-    notifyListeners();
+    if(this._paginaActual!=value){
+      this._paginaActual=value;
+      _pageController.animateToPage(value, duration: Duration(milliseconds: 500), curve: Curves.easeOut);
+      notifyListeners();
+    }
   }
 
   PageController get pageController=>this._pageController;

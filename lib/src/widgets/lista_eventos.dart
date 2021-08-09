@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:credencializacion_digital/src/models/Evento.dart';
+import 'package:credencializacion_digital/src/models/EventoModel.dart';
 import 'package:credencializacion_digital/src/services/eventos_service.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:flutter/material.dart';
@@ -74,10 +74,8 @@ class _TarjetaImagen extends StatelessWidget {
     return Container(
       child: ClipRRect(
         borderRadius: BorderRadius.only(topLeft: Radius.circular(50),bottomRight: Radius.circular(50)),
-        child: (evento.urlImagen.isNotEmpty)? FadeInImage(
-            placeholder: AssetImage('assets/img/giphy.gif'),
-            image: MemoryImage(base64Decode(evento.urlImagen)),
-          ):Image(image: AssetImage('assets/img/no-image.png'),)
+        child: (evento.urlImagen.isNotEmpty)? Image.memory(base64Decode(evento.urlImagen))
+          :Image(image: AssetImage('assets/img/no-image.png'),)
         
       ),
     );

@@ -1,7 +1,7 @@
 
 import 'dart:convert';
 
-import 'package:credencializacion_digital/src/models/Alumno.dart';
+import 'package:credencializacion_digital/src/models/UsuarioModel.dart';
 import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_microsoft_authentication/flutter_microsoft_authentication.dart';
@@ -57,13 +57,22 @@ class MicrosoftService{
     return username;
   }
 
-  Future<Alumno> fetchMicrosoftProfile(FlutterMicrosoftAuthentication fma) async {
+  Future<Usuario> fetchMicrosoftProfile(FlutterMicrosoftAuthentication fma) async {
+    final usuariocorreo=await fma.loadAccount;
     final token=await loadToken(fma);
-    var response = await http.get(Uri.parse(perfilUsuario), headers: {
-      "Authorization": "Bearer " + token
-    });
-    final usuario=alumnoResponse(response.body,prefUser.imagenUsuario);
-    return usuario;
+    if(int.tryParse(usuariocorreo.substring(0,8))!=null  && usuariocorreo.substring(8,9)=='@'){
+      var response = await http.get(Uri.parse(perfilUsuario), headers: {
+        "Authorization": "Bearer " + token
+      });
+      final usuario=alumnoResponse(response.body,prefUser.imagenUsuario);
+      return usuario;
+    }else{
+      final url='https://api.utmetropolitana.edu.mx/api/Empleados/Get?correoinstitucional='+usuariocorreo;
+      var response = await http.get(Uri.parse(url));
+      final jsonResponse=jsonDecode(response.body.replaceAll('[','').replaceAll(']',''));
+      final usuario=empleadoResponse(jsonResponse, prefUser.imagenUsuario);
+      return usuario;
+    }
   }
   guardarImagen(FlutterMicrosoftAuthentication fma)async{
     final token=await loadToken(fma);
@@ -77,12 +86,22 @@ class MicrosoftService{
 
   guardarDatos(FlutterMicrosoftAuthentication fma) async{
     final token=await loadToken(fma);
-    var response = await http.get(Uri.parse(perfilUsuario), headers: {
-      "Authorization": "Bearer " + token
-    });
-    final json=jsonDecode(response.body);
-    prefUser.nombreUsuario=json['displayName'];
-    prefUser.identificadorUsuario=json['mail'].toString().substring(0,8);
+    final usuariocorreo=await fma.loadAccount;
+    if(int.tryParse(usuariocorreo.substring(0,8))!=null  && usuariocorreo.substring(8,9)=='@'){
+      var response = await http.get(Uri.parse(perfilUsuario), headers: {
+        "Authorization": "Bearer " + token
+      });
+      final json=jsonDecode(response.body);
+      prefUser.nombreUsuario=json['displayName'];
+      prefUser.identificadorUsuario=json['mail'].toString().substring(0,8);
+    }else{
+      final url='https://api.utmetropolitana.edu.mx/api/Empleados/Get?correoinstitucional='+usuariocorreo;
+      var response = await http.get(Uri.parse(url));
+      final jsonResponse=jsonDecode(response.body.replaceAll('[','').replaceAll(']',''));
+      final json=jsonDecode(jsonResponse);
+      prefUser.nombreUsuario=(json['PrimerNombre']+" "??'')+(json['SegundoNombre']+" "??'')+(json['PrimerApellido']+" "??'')+(json['SegundoApellido']+" "??'');
+      prefUser.identificadorUsuario=json['ClaveEmpleado'];
+    }
   }
 
   Future<String> loadToken(FlutterMicrosoftAuthentication fma)async{

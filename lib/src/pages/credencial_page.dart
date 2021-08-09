@@ -1,4 +1,4 @@
-import 'package:credencializacion_digital/src/models/Alumno.dart';
+import 'package:credencializacion_digital/src/models/UsuarioModel.dart';
 import 'package:credencializacion_digital/src/pages/inicio_sesion_page.dart';
 import 'package:credencializacion_digital/src/services/microsoft_service.dart';
 import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
@@ -54,7 +54,7 @@ class _CredencialPageState extends State<CredencialPage> {
         ),
         child: FutureBuilder(
           future: microsoftService.fetchMicrosoftProfile(fma),
-          builder: (BuildContext context,AsyncSnapshot<Alumno> snapshot){
+          builder: (BuildContext context,AsyncSnapshot<Usuario> snapshot){
             if(snapshot.hasData){
               return Container(
                 margin: EdgeInsets.symmetric(horizontal: 10),
@@ -109,7 +109,7 @@ class _InfoGeneral extends StatelessWidget {
   });
 
   final Size size;
-  final Alumno user;
+  final Usuario user;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -134,7 +134,7 @@ class _InfoAcademica extends StatelessWidget {
   const _InfoAcademica({
     @required this.user,
   });
-  final Alumno user;
+  final Usuario user;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -143,9 +143,10 @@ class _InfoAcademica extends StatelessWidget {
         Text('Información',style: TextStyle(fontSize: 28,fontWeight: FontWeight.bold),),
         SizedBox(height: 10),
         textoDato(titulo: 'Nombre', cuerpo: user.nombre),
-        textoDato(titulo: 'Matricula', cuerpo: user.matricula),
+        textoDato(titulo: 'Matricula', cuerpo: user.identificador),
         textoDato(titulo: 'Correo Institucional', cuerpo: user.correoInstitucional),
-        textoDato(titulo: 'status', cuerpo: user.titulo),
+        textoDato(titulo: 'Status', cuerpo: user.titulo),
+        if(user.departamento!='') textoDato(titulo: 'Departamento', cuerpo: user.departamento),
         textoDato(titulo: 'Dirección de la Universidad', cuerpo: 'Calle 111 número 315, Santa Rosa, 97279 Mérida, Yuc.'),
       ],
     );

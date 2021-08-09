@@ -1,4 +1,4 @@
-import 'package:credencializacion_digital/src/models/Favorito.dart';
+import 'package:credencializacion_digital/src/models/FavoritoModel.dart';
 import 'package:meta/meta.dart';
 import 'dart:convert';
 
@@ -47,7 +47,7 @@ class Evento{
     contenido: json['content']??'',
     fechaInicio:DateTime.parse(json['startDate'])??DateTime.now(),
     fechaFinal: DateTime.parse(json['endDate'])??DateTime.now(),
-    autor:Autor.fromJson(json['author'])??Autor(idAutor: 0, nombre: ''),
+    autor: json['author']!= null ? Autor.fromJson(json['author']):Autor(idAutor: 0, nombre: ''),
     urlImagen: json['image']??'',
     esActivo: json['isActivity']??false,
     esSugerido: json['isSuggest']??false,
