@@ -52,8 +52,8 @@ class Evento{
     esActivo: json['isActivity']??false,
     esSugerido: json['isSuggest']??false,
     esPublicado: json['isPublished']??false,
-    // favoritos: List<Favorito>.from(json['eventFavorite'].map((x) => Favorito.fromJson(x))),
-    favoritos: [],
+    favoritos: List<Favorito>.from(json['favorites'].map((x) => Favorito.fromJson(x)))??[],
+    // favoritos: json['favorites']??[],
   );
 }
 

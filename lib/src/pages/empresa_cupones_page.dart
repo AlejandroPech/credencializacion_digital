@@ -28,13 +28,13 @@ class EmpresaCuponesPage extends StatefulWidget {
 class _EmpresaCuponesPageState extends State<EmpresaCuponesPage> {
   List<CuponesImagen> _listCuponesImagen = [];
   String idCupon;
-  final String baseurl = "https://c324a5a94838.ngrok.io";
+  final String baseurl = "http://192.168.54.100:9097/api";
 
   void _dataFromApi() async {
     final Dio dio = new Dio();
     try {
       var response =
-          await dio.get("$baseurl/api/CuponesImagen/empresa/${widget.idEm}");
+          await dio.get("$baseurl/CuponesImagen/empresa/${widget.idEm}");
       print(response.statusCode);
       print(response.data);
 
@@ -117,7 +117,7 @@ class _ImagenAndButtonBack extends StatelessWidget {
   Widget build(BuildContext context) {
     final prefUser = PrefUser();
 
-    final String baseurl = "https://c324a5a94838.ngrok.io";
+    final String baseurl = "http://192.168.54.100:9097/api";
     return Stack(
       children: [
         Container(
@@ -126,7 +126,7 @@ class _ImagenAndButtonBack extends StatelessWidget {
               image: DecorationImage(
                   fit: BoxFit.cover,
                   image: NetworkImage(
-                      "$baseurl/api/empresas/image?nombreArchivo=${this.imagen}"))),
+                      "$baseurl/empresas/image?nombreArchivo=${this.imagen}"))),
         ),
         SafeArea(
           child: BackButton(),
@@ -193,7 +193,7 @@ class _Cupnoes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Dio dio = new Dio();
-    final String baseurl = "https://c324a5a94838.ngrok.io";
+    final String baseurl = "http://192.168.54.100:9097/api";
     return Column(children: [
       ...listaCupones.map((cupones) => _Cupon(
             urlImage: "${cupones.imagen}",
@@ -222,12 +222,12 @@ class _Cupon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = Provider.of<ThemeChanger>(context);
-    final String baseurl = "https://c324a5a94838.ngrok.io";
+    final String baseurl = "http://192.168.54.100:9097/api";
     void _usarCupon() async {
       final Dio dio = new Dio();
       try {
         var respuesta =
-            await dio.get("$baseurl/api/CuponesImagen/${this.idCupon}");
+            await dio.get("$baseurl/CuponesImagen/${this.idCupon}");
         print(respuesta.statusCode);
         print(respuesta.data);
 
@@ -236,7 +236,7 @@ class _Cupon extends StatelessWidget {
 
         if (respuesta.statusCode == 200) {
           var response = await dio.put(
-              "$baseurl/api/CuponesImagen/apply/?id=${this.idCupon}",
+              "$baseurl/CuponesImagen/apply/?id=${this.idCupon}",
               data: jsonEncode(listacupon));
           if (response.statusCode == 200) {
             print("cupon usado");
@@ -263,7 +263,7 @@ class _Cupon extends StatelessWidget {
                   image: DecorationImage(
                       fit: BoxFit.cover,
                       image: NetworkImage(
-                          "$baseurl/api/CuponesImagen/image?nombreArchivo=${this.urlImage}"))),
+                          "$baseurl/CuponesImagen/image?nombreArchivo=${this.urlImage}"))),
             ),
             Expanded(
               child: Column(

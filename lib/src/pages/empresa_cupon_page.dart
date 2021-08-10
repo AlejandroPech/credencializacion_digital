@@ -26,13 +26,13 @@ class EmpresaCuponPage extends StatefulWidget {
 class _EmpresaCuponPageState extends State<EmpresaCuponPage> {
   List<CuponesGenericos> _listCuponesGenericos = [];
 
-  final String baseurl = "https://c324a5a94838.ngrok.io";
+  final String baseurl = "http://192.168.54.100:9097/api";
 
   void _dataFromApi() async {
     final Dio dio = new Dio();
     try {
       var response =
-          await dio.get("$baseurl/api/CuponesGenericos/empresa/${widget.idEm}");
+          await dio.get("$baseurl/CuponesGenericos/empresa/${widget.idEm}");
       print(response.statusCode);
       print(response.data);
 
@@ -85,7 +85,7 @@ class _ImagenAndButtonBack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseurl = "https://c324a5a94838.ngrok.io";
+    final baseurl = "http://192.168.54.100:9097/api";
     return Stack(
       children: [
         Container(
@@ -94,7 +94,7 @@ class _ImagenAndButtonBack extends StatelessWidget {
               image: DecorationImage(
                   fit: BoxFit.cover,
                   image: NetworkImage(
-                      "$baseurl/api/empresas/image?nombreArchivo=${this.urlImage}"))),
+                      "$baseurl/empresas/image?nombreArchivo=${this.urlImage}"))),
         ),
         SafeArea(
           child: BackButton(),
@@ -108,13 +108,13 @@ class _Cuerpo extends StatelessWidget {
   final List<CuponesGenericos> cuponGenerico;
   final String idCupon;
   const _Cuerpo({this.cuponGenerico, this.idCupon});
-  final String baseurl = "https://c324a5a94838.ngrok.io";
+  final String baseurl = "http://192.168.54.100:9097/api";
 
   void _usarCupon() async {
     final Dio dio = new Dio();
     try {
       var respuesta =
-          await dio.get("$baseurl/api/CuponesGenericos/${this.idCupon}");
+          await dio.get("$baseurl/CuponesGenericos/${this.idCupon}");
       print(respuesta.statusCode);
       print(respuesta.data);
 
@@ -123,7 +123,7 @@ class _Cuerpo extends StatelessWidget {
 
       if (respuesta.statusCode == 200) {
         var response = await dio.put(
-            "$baseurl/api/CuponesGenericos/apply?id=${listacupon['cuponGeneridoId']}",
+            "$baseurl/CuponesGenericos/apply?id=${listacupon['cuponGeneridoId']}",
             data: jsonEncode(listacupon));
         if (response.statusCode == 200) {
           print("cupon usado");
@@ -142,7 +142,7 @@ class _Cuerpo extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = Provider.of<ThemeChanger>(context);
     final Dio dio = new Dio();
-    final baseurl = "https://c324a5a94838.ngrok.io";
+    final baseurl = "http://192.168.54.100:9097/api";
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10),
       child: Column(

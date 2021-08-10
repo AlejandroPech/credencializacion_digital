@@ -7,6 +7,6 @@ class Favorito{
 
   Favorito({@required this.identificador});
   factory Favorito.fromJson(Map<String,dynamic> json)=>Favorito(
-    identificador: json['matricula']??'',
+    identificador: json['clave']??'',
   );
 }

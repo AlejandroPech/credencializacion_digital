@@ -28,12 +28,12 @@ class _EmpresaPageState extends State<EmpresaPage> {
   //localhost ios 127.0.0.1
   //localhost Android 10.0.2.2
 
-  final String baseurl = "https://c324a5a94838.ngrok.io";
+  final String baseurl = "http://192.168.54.100:9097/api";
 
   void _dataFromApi() async {
     final Dio dio = new Dio();
     try {
-      var response = await dio.get("$baseurl/api/Empresas");
+      var response = await dio.get("$baseurl/Empresas");
       print(response.statusCode);
       print(response.data);
       List responseData = jsonDecode(response.data);
@@ -95,14 +95,14 @@ class Carditem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String baseurl = "https://c324a5a94838.ngrok.io";
+    final String baseurl = "http://192.168.54.100:9097/api";
     return Card(
       child: Center(
         child: Column(
           children: <Widget>[
             Expanded(
               child: Image.network(
-                "$baseurl/api/empresas/image?nombreArchivo=${this.image}",
+                "$baseurl/empresas/image?nombreArchivo=${this.image}",
                 fit: BoxFit.cover,
               ),
             ),
