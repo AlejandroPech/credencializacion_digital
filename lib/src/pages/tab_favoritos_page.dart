@@ -17,7 +17,7 @@ class _TabPaginaFavoritosState extends State<TabPaginaFavoritos> with AutomaticK
     super.build(context);
     final eventoService = Provider.of<EventosService>(context);
     return Scaffold(
-      body: ListaEventos(eventos:eventoService.eventos ),
+      body: ListaEventos(eventos:eventoService.obtenerFavoritos),
     );
   }
 }

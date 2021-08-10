@@ -2,13 +2,11 @@ import 'package:credencializacion_digital/src/models/EventoModel.dart';
 import 'package:meta/meta.dart';
 
 class Favorito{
-  int favoritoId;
-  String matricula;
+  String identificador;
   List<Evento> eventos=[];
 
-  Favorito({@required this.matricula,@required this.favoritoId});
+  Favorito({@required this.identificador});
   factory Favorito.fromJson(Map<String,dynamic> json)=>Favorito(
-    favoritoId: json['id']??0,
-    matricula: json['matricula']??'',
+    identificador: json['matricula']??'',
   );
 }

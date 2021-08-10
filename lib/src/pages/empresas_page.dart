@@ -1,102 +1,81 @@
+import 'dart:convert';
+
 import 'package:credencializacion_digital/src/pages/empresa_cupon_page.dart';
 import 'package:credencializacion_digital/src/pages/empresa_cupones_page.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:credencializacion_digital/src/widgets/menu_widget.dart';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:meta/meta.dart';
+import 'package:credencializacion_digital/src/models/Empresas.dart';
+import 'package:dio/dio.dart';
+import 'package:http/http.dart' as http;
 
 class EmpresaPage extends StatefulWidget {
-  static final String routeName='empresa';
+  static final String routeName = 'empresa';
   final String title;
 
-  EmpresaPage({Key key,@required this.title}) : super(key: key);
+  EmpresaPage({Key key, @required this.title}) : super(key: key);
 
   @override
   _EmpresaPageState createState() => _EmpresaPageState();
 }
 
 class _EmpresaPageState extends State<EmpresaPage> {
+  List<Empresas> empresas = [];
+  String idEmpresa;
+  //el localhost en disposividos reales se significa otra cosa.
+  //localhost ios 127.0.0.1
+  //localhost Android 10.0.2.2
+
+  final String baseurl = "https://c324a5a94838.ngrok.io";
+
+  void _dataFromApi() async {
+    final Dio dio = new Dio();
+    try {
+      var response = await dio.get("$baseurl/api/Empresas");
+      print(response.statusCode);
+      print(response.data);
+      List responseData = jsonDecode(response.data);
+
+      setState(() {
+        empresas = responseData.map((e) => Empresas.fromJson(e)).toList();
+      });
+    } on DioError catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _dataFromApi();
+  }
+
   @override
   Widget build(BuildContext context) {
     bool isLarge;
 
-    if(MediaQuery.of(context).size.width>=500){
-      isLarge=true;
-    }else{
-      isLarge=false;
+    if (MediaQuery.of(context).size.width >= 500) {
+      isLarge = true;
+    } else {
+      isLarge = false;
     }
-
-    final appTheme= Provider.of<ThemeChanger>(context);
+    final appTheme = Provider.of<ThemeChanger>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
       drawer: MenuWidget(),
       body: GridView.count(
-        crossAxisCount: (isLarge)?3:2,
+        crossAxisCount: (isLarge) ? 3 : 2,
         children: [
-          Carditem(
-              image: "https://media-cdn.tripadvisor.com/media/photo-s/08/af/e2/d3/distrito-capital-federal.jpg",
-              color: appTheme.currentTheme.accentColor,
-              urlNavegar: EmpresaCuponPage.routeName,
-          ),
-          Carditem(
-            image: "https://www.america-retail.com/static//2020/08/Noticia-5-1-de-3-339.png",
-            color: appTheme.currentTheme.accentColor,
-            urlNavegar: EmpresaCuponesPage.routeName,
-          ),
-          Carditem(
-              image: "https://media-cdn.tripadvisor.com/media/photo-s/08/af/e2/d3/distrito-capital-federal.jpg",
-              color: appTheme.currentTheme.accentColor,
-              urlNavegar: EmpresaCuponPage.routeName,
-          ),
-          Carditem(
-            image: "https://www.peru-retail.com/wp-content/uploads/Little-Caesars-1.jpg",
-            color: appTheme.currentTheme.accentColor,
-            urlNavegar: EmpresaCuponPage.routeName,
-          ),
-          Carditem(
-              image: "https://media-cdn.tripadvisor.com/media/photo-s/08/af/e2/d3/distrito-capital-federal.jpg",
-              color: appTheme.currentTheme.accentColor,
-              urlNavegar: EmpresaCuponPage.routeName,
-          ),
-          Carditem(
-            image: "https://www.america-retail.com/static//2020/08/Noticia-5-1-de-3-339.png",
-            color: appTheme.currentTheme.accentColor,
-            urlNavegar: EmpresaCuponesPage.routeName,
-          ),
-          Carditem(
-              image: "https://media-cdn.tripadvisor.com/media/photo-s/08/af/e2/d3/distrito-capital-federal.jpg",
-              color: appTheme.currentTheme.accentColor,
-              urlNavegar: EmpresaCuponPage.routeName,
-          ),
-          Carditem(
-            image: "https://www.peru-retail.com/wp-content/uploads/Little-Caesars-1.jpg",
-            color: appTheme.currentTheme.accentColor,
-            urlNavegar: EmpresaCuponPage.routeName,
-          ),
-          Carditem(
-              image: "https://media-cdn.tripadvisor.com/media/photo-s/08/af/e2/d3/distrito-capital-federal.jpg",
-              color: appTheme.currentTheme.accentColor,
-              urlNavegar: EmpresaCuponesPage.routeName,
-          ),
-          Carditem(
-            image: "https://www.america-retail.com/static//2020/08/Noticia-5-1-de-3-339.png",
-            color: appTheme.currentTheme.accentColor,
-            urlNavegar: EmpresaCuponPage.routeName,
-          ),
-          Carditem(
-              image: "https://media-cdn.tripadvisor.com/media/photo-s/08/af/e2/d3/distrito-capital-federal.jpg",
-              color: appTheme.currentTheme.accentColor,
-              urlNavegar: EmpresaCuponPage.routeName,
-          ),
-          Carditem(
-            image: "https://www.peru-retail.com/wp-content/uploads/Little-Caesars-1.jpg",
-            color: appTheme.currentTheme.accentColor,
-            urlNavegar: EmpresaCuponPage.routeName,
-          ),
+          ...empresas.map((empresa) => Carditem(
+                image: ("${empresa.url}"),
+                color: appTheme.currentTheme.accentColor,
+                urlNavegar: EmpresaCuponPage.routeName,
+                idempresa: ("${empresa.empresaId}"),
+              )),
         ],
       ),
     );
@@ -107,24 +86,41 @@ class Carditem extends StatelessWidget {
   final String image;
   final Color color;
   final String urlNavegar;
-  const Carditem({@required this.image, @required this.color,@required this.urlNavegar});
+  final String idempresa;
+  const Carditem(
+      {@required this.image,
+      @required this.color,
+      @required this.urlNavegar,
+      @required this.idempresa});
 
   @override
   Widget build(BuildContext context) {
+    final String baseurl = "https://c324a5a94838.ngrok.io";
     return Card(
       child: Center(
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                child: Image.network(this.image,fit: BoxFit.cover,),
+        child: Column(
+          children: <Widget>[
+            Expanded(
+              child: Image.network(
+                "$baseurl/api/empresas/image?nombreArchivo=${this.image}",
+                fit: BoxFit.cover,
               ),
-              
-              TextButton(
-                onPressed:()=>Navigator.pushNamed(context, urlNavegar),
-                child: Text('Ver Cupones',style: TextStyle(color: this.color,fontSize: 18),),
-              )
-            ],
-          ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute<Null>(builder: (BuildContext context) {
+                  return new EmpresaCuponesPage(
+                      idEm: idempresa, image: image, title: "empresa");
+                }));
+              },
+              child: Text(
+                'Ver Cupones',
+                style: TextStyle(color: this.color, fontSize: 18),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

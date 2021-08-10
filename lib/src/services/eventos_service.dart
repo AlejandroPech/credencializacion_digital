@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:credencializacion_digital/src/models/EventoModel.dart';
+import 'package:credencializacion_digital/src/models/FavoritoModel.dart';
+import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-final _urlEventos='http://192.168.54.100:9095/api/Event/';
+// final _urlApi='http://192.168.54.100:9095/api/';
+final _urlApi='http://192.168.54.100:9096/api/';
 
 class EventosService with ChangeNotifier{
   List<Evento> eventos=[];
@@ -11,7 +16,7 @@ class EventosService with ChangeNotifier{
   String _categoriaSeleccionada='Todos';
   Map<String,List<Evento>> categoriasEvento={};
   bool _estaCargando=true;
-
+  PrefUser prefUser = new PrefUser();
   EventosService(){
     this.getEvents();
     categorias.forEach((element) {
@@ -22,7 +27,7 @@ class EventosService with ChangeNotifier{
 
   getEvents()async{
     
-    final newResponse=await http.get(Uri.parse(_urlEventos+'GetPublished'));
+    final newResponse=await http.get(Uri.parse(_urlApi+'Event/GetPublished'));
     final response=eventosResponse(newResponse.body);
     // eventos=[];
     this.eventos.addAll(response.eventos);
@@ -44,7 +49,7 @@ class EventosService with ChangeNotifier{
     }
     String url=getCategory(categoria);
     this._estaCargando=true;
-    final newResponse=await http.get(Uri.parse(_urlEventos+url));
+    final newResponse=await http.get(Uri.parse(_urlApi+'Event/'+url));
     final response=eventosResponse(newResponse.body);
     this._estaCargando=false;
     this.categoriasEvento[categoria].addAll(response.eventos);
@@ -76,4 +81,40 @@ class EventosService with ChangeNotifier{
   bool get estaCargando => this._estaCargando;
 
   List<Evento> get getEventosSeleccionados=>this.categoriasEvento[this._categoriaSeleccionada]??[];
+
+  checkLikeEvent(String identificador,int eventoID){
+    Evento evento=categoriasEvento['Todos'].firstWhere((element) => element.eventoId==eventoID);
+    if(evento.favoritos.any((element) => element.identificador==identificador)){
+      eliminarLike(identificador, eventoID);
+    }else{
+      agregarLike(identificador, eventoID);
+    }
+  }
+
+  agregarLike(String identificador,int eventoID)async {
+    Map<String,dynamic>body ={"clave": identificador,"eventId": eventoID,};
+    var response= await http.post(Uri.parse(_urlApi+'Favorites'),
+      body:json.encode(body),
+    );
+    categorias.forEach((element) {
+      if(categoriasEvento[element].length>0){
+        categoriasEvento[element].firstWhere((element) => element.eventoId==eventoID).favoritos.add(new Favorito(identificador: identificador));
+      }
+    });
+    notifyListeners();
+  }
+  eliminarLike(String identificador,int eventoID)async {
+    Map<String,dynamic>body ={"clave": identificador,"eventId": eventoID,};
+    var response=await http.delete(Uri.parse(_urlApi+'Favorites'),
+      body: jsonEncode(body),
+    );
+    categorias.forEach((element) {
+      if(categoriasEvento[element].length>0){
+        categoriasEvento[element].firstWhere((element) => element.eventoId==eventoID).favoritos.removeWhere((element) => element.identificador==identificador);
+      }
+    });
+    notifyListeners();
+  }
+
+  List<Evento> get obtenerFavoritos=>categoriasEvento['Todos'].where((element) => element.favoritos.any((element) => element.identificador==prefUser.identificadorUsuario)).toList();
 }

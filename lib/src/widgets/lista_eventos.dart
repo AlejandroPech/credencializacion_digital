@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:credencializacion_digital/src/models/EventoModel.dart';
 import 'package:credencializacion_digital/src/services/eventos_service.dart';
+import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -74,7 +75,7 @@ class _TarjetaImagen extends StatelessWidget {
     return Container(
       child: ClipRRect(
         borderRadius: BorderRadius.only(topLeft: Radius.circular(50),bottomRight: Radius.circular(50)),
-        child: (evento.urlImagen.isNotEmpty)? Image.memory(base64Decode(evento.urlImagen))
+        child: (evento.urlImagen.isNotEmpty)? Image.memory(base64Decode(evento.urlImagen),gaplessPlayback: true,)
           :Image(image: AssetImage('assets/img/no-image.png'),)
         
       ),
@@ -105,23 +106,22 @@ class _TarjetaCuerpo extends StatelessWidget {
 
 class _TarjetaBotones extends StatelessWidget {
   final Evento evento;
-
   const _TarjetaBotones({@required this.evento});
 
   @override
   Widget build(BuildContext context) {
     final appTheme= Provider.of<ThemeChanger>(context).currentTheme;
     final eventoService = Provider.of<EventosService>(context);
+    final prefUser = PrefUser();
     return Container(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
             onTap: (){
-              eventoService.getEvents();
-              print('hey');
+              eventoService.checkLikeEvent(prefUser.identificadorUsuario, evento.eventoId);
             },
-            child:(evento.favoritos.any((element) => element.matricula=='123456789'))?Icon(Icons.favorite,color: appTheme.accentColor,):Icon(Icons.favorite)
+            child:(evento.favoritos.any((element) => element.identificador==prefUser.identificadorUsuario))?Icon(Icons.favorite,color: appTheme.accentColor,):Icon(Icons.favorite)
           ),
           Text(evento.fechaInicio.toString())
         ],

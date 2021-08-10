@@ -1,31 +1,107 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:credencializacion_digital/src/models/CuponesImagen.dart';
+import 'package:credencializacion_digital/src/pages/empresa_cupon_page.dart';
+import 'package:credencializacion_digital/src/pages/empresas_page.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:meta/meta.dart';
+import 'package:dio/dio.dart';
+import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
+
 class EmpresaCuponesPage extends StatefulWidget {
-  static final String routeName='empresaCupones';
+  static final String routeName = 'empresaCupones';
   final String title;
-  EmpresaCuponesPage({Key key,@required this.title}) : super(key: key);
+  final String idEm;
+  final String image;
+
+  EmpresaCuponesPage({Key key, @required this.title, this.idEm, this.image})
+      : super(key: key);
 
   @override
   _EmpresaCuponesPageState createState() => _EmpresaCuponesPageState();
 }
 
 class _EmpresaCuponesPageState extends State<EmpresaCuponesPage> {
+  List<CuponesImagen> _listCuponesImagen = [];
+  String idCupon;
+  final String baseurl = "https://c324a5a94838.ngrok.io";
+
+  void _dataFromApi() async {
+    final Dio dio = new Dio();
+    try {
+      var response =
+          await dio.get("$baseurl/api/CuponesImagen/empresa/${widget.idEm}");
+      print(response.statusCode);
+      print(response.data);
+
+      var responseData = response.data as List;
+
+      setState(() {
+        _listCuponesImagen =
+            responseData.map((e) => CuponesImagen.fromJson(e)).toList();
+      });
+    } on DioError catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _dataFromApi();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final size= MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
     return Scaffold(
-      
-      body: SafeArea(
-        child: ListView(
-          children: [
-            _ImagenAndButtonBack(size: size),
-            _Usuario(size: size),
-            _Cupnoes(size: size),
-          ],
-        ),
+      body: PageView(
+        children: [
+          CuponesImagenPagina(
+            size: size,
+            listCuponesImagen: _listCuponesImagen,
+            imagen: widget.image,
+          ),
+          EmpresaCuponPage(
+            title: "empresa",
+            idEm: widget.idEm,
+            image: widget.image,
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class CuponesImagenPagina extends StatelessWidget {
+  final String imagen;
+  const CuponesImagenPagina({
+    Key key,
+    @required this.size,
+    @required List<CuponesImagen> listCuponesImagen,
+    @required this.imagen,
+  })  : _listCuponesImagen = listCuponesImagen,
+        super(key: key);
+
+  final Size size;
+  final List<CuponesImagen> _listCuponesImagen;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: ListView(
+        children: [
+          _ImagenAndButtonBack(
+            size: size,
+            imagen: this.imagen,
+          ),
+          _Usuario(size: size),
+          _Cupnoes(size: size, listaCupones: _listCuponesImagen),
+        ],
       ),
     );
   }
@@ -33,22 +109,24 @@ class _EmpresaCuponesPageState extends State<EmpresaCuponesPage> {
 
 class _ImagenAndButtonBack extends StatelessWidget {
   final Size size;
-  const _ImagenAndButtonBack({
-    @required this.size,
-  });
+  final String imagen;
+
+  const _ImagenAndButtonBack({@required this.size, @required this.imagen});
 
   @override
   Widget build(BuildContext context) {
+    final prefUser = PrefUser();
+
+    final String baseurl = "https://c324a5a94838.ngrok.io";
     return Stack(
-      children:[
+      children: [
         Container(
           height: size.height / 4,
-          decoration: BoxDecoration( 
-            image:DecorationImage( 
-              fit: BoxFit.cover,
-              image: NetworkImage('https://media-cdn.tripadvisor.com/media/photo-s/08/af/e2/d3/distrito-capital-federal.jpg')
-            )
-          ),
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: NetworkImage(
+                      "$baseurl/api/empresas/image?nombreArchivo=${this.imagen}"))),
         ),
         SafeArea(
           child: BackButton(),
@@ -59,35 +137,44 @@ class _ImagenAndButtonBack extends StatelessWidget {
 }
 
 class _Usuario extends StatelessWidget {
-  const _Usuario({@required this.size,});
+  const _Usuario({
+    @required this.size,
+  });
 
   final Size size;
 
   @override
   Widget build(BuildContext context) {
+    final prefUser = PrefUser();
     return Container(
-      height: size.height/6,
+      height: size.height / 6,
       width: size.width,
       padding: EdgeInsets.symmetric(horizontal: 10),
       margin: EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
-          CircleAvatar(radius: size.height/20, backgroundImage: NetworkImage('https://image.freepik.com/vector-gratis/hombre-muestra-gesto-gran-idea_10045-637.jpg')),
+          CircleAvatar(
+              radius: size.height / 20,
+              backgroundImage: MemoryImage(
+                  Uint8List.fromList(prefUser.imagenUsuario.codeUnits))),
           SizedBox(width: 15),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: size.width*0.7,
+                width: size.width * 0.7,
                 child: Text(
-                  'Jesus Alejandro Pech paredes',
-                  style: TextStyle(fontSize: 28,),maxLines: 2,
+                  prefUser.nombreUsuario,
+                  style: TextStyle(
+                    fontSize: 28,
+                  ),
+                  maxLines: 2,
                 ),
               ),
               SizedBox(height: 4),
               Text(
-                '19090529',
+                'Univeridad Tecnologica Metropolitana',
                 style: TextStyle(fontSize: 18),
               ),
             ],
@@ -100,29 +187,22 @@ class _Usuario extends StatelessWidget {
 
 class _Cupnoes extends StatelessWidget {
   final Size size;
-  const _Cupnoes({this.size});
-  
+  final List<CuponesImagen> listaCupones;
+  const _Cupnoes({this.size, this.listaCupones});
+
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children:[
-        _Cupon(
-          urlImage: "https://www.mistercomparador.com/noticias/wp-content/uploads/2014/11/qr.png", 
-          size: size,
-          descripcion: 'Este cupon tiene un 20% de descuento',
-        ),  
-        _Cupon(
-          urlImage: "https://www.mistercomparador.com/noticias/wp-content/uploads/2014/11/qr.png", 
-          size: size,
-          descripcion: 'Este cupon tiene un 20% de descuento',
-        ),  
-        _Cupon(
-          urlImage: "https://www.mistercomparador.com/noticias/wp-content/uploads/2014/11/qr.png", 
-          size: size,
-          descripcion:'Este cupon tiene un 20% de descuento',
-        ),
-      ]
-    );
+    final Dio dio = new Dio();
+    final String baseurl = "https://c324a5a94838.ngrok.io";
+    return Column(children: [
+      ...listaCupones.map((cupones) => _Cupon(
+            urlImage: "${cupones.imagen}",
+            size: size,
+            descripcion: ("${cupones.descripcion}"),
+            idCupon: ("${cupones.cuponesImagenId}"),
+            listaCupones: listaCupones,
+          )),
+    ]);
   }
 }
 
@@ -130,54 +210,99 @@ class _Cupon extends StatelessWidget {
   final Size size;
   final String urlImage;
   final String descripcion;
-  const _Cupon({@required this.urlImage,@required this.size,@required this.descripcion});
+  final String idCupon;
+  final List<CuponesImagen> listaCupones;
+  const _Cupon(
+      {@required this.urlImage,
+      @required this.size,
+      @required this.descripcion,
+      this.idCupon,
+      this.listaCupones});
 
   @override
   Widget build(BuildContext context) {
-    final appTheme= Provider.of<ThemeChanger>(context);
+    final appTheme = Provider.of<ThemeChanger>(context);
+    final String baseurl = "https://c324a5a94838.ngrok.io";
+    void _usarCupon() async {
+      final Dio dio = new Dio();
+      try {
+        var respuesta =
+            await dio.get("$baseurl/api/CuponesImagen/${this.idCupon}");
+        print(respuesta.statusCode);
+        print(respuesta.data);
+
+        Map<String, dynamic> listacupon =
+            new Map<String, dynamic>.from(respuesta.data);
+
+        if (respuesta.statusCode == 200) {
+          var response = await dio.put(
+              "$baseurl/api/CuponesImagen/apply/?id=${this.idCupon}",
+              data: jsonEncode(listacupon));
+          if (response.statusCode == 200) {
+            print("cupon usado");
+          } else {
+            print("cupon no usado");
+          }
+        } else {
+          print("Error en status code");
+        }
+      } on DioError catch (e) {
+        print(e);
+      }
+    }
+
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 5,vertical:15),
+      margin: EdgeInsets.symmetric(horizontal: 5, vertical: 15),
       height: size.height / 4,
       child: Card(
         child: Row(
           children: [
             Container(
               width: size.height / 4,
-              decoration: BoxDecoration( 
-                image:DecorationImage( 
-                  fit: BoxFit.cover,
-                  image: NetworkImage('https://latam.kaspersky.com/content/es-mx/images/repository/isc/2020/9910/a-guide-to-qr-codes-and-how-to-scan-qr-codes-2.png')
-                )
-              ),
+              decoration: BoxDecoration(
+                  image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: NetworkImage(
+                          "$baseurl/api/CuponesImagen/image?nombreArchivo=${this.urlImage}"))),
             ),
             Expanded(
               child: Column(
                 mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Expanded(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
+                children: [
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
                             child: Container(
-                              margin: EdgeInsets.all(10),
-                              child: Text('Descripción:  $descripcion',style: TextStyle(fontSize: 20),)
-                            )
-                          ),
-                        ],
-                      ),
+                                margin: EdgeInsets.all(10),
+                                child: Text(
+                                  'Descripción:  ${this.descripcion}',
+                                  style: TextStyle(fontSize: 20),
+                                ))),
+                      ],
                     ),
-                    Container(
-                      child: ElevatedButton(
-                        onPressed: (){},
-                        child: Text('Aplicar Cupón'),
-                        style: ElevatedButton.styleFrom(
-                            primary: appTheme.currentTheme.accentColor
-                        ),
-                      ),
+                  ),
+                  Container(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _usarCupon();
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => EmpresaPage(
+                                    title: "Empresa",
+                                  )),
+                        );
+                      },
+                      child: Text('Aplicar Cupón'),
+                      style: ElevatedButton.styleFrom(
+                          primary: appTheme.currentTheme.accentColor),
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

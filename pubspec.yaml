@@ -32,7 +32,11 @@ dependencies:
   shared_preferences: ^2.0.6
   http: ^0.13.3
   flutter_microsoft_authentication: ^0.1.1
+<<<<<<< HEAD
   flutter_html: ^2.1.1
+=======
+  dio: ^4.0.0
+>>>>>>> cf550309cd05f788cc1d8b91acc965e80e245f84
 
 dev_dependencies:
   flutter_test:

@@ -121,7 +121,14 @@ class _InfoGeneral extends StatelessWidget {
             Center(child: Image.asset('assets/img/logo-utm.png',width: size.width/2,height:size.height/5,)),
             Container(
               margin: EdgeInsets.symmetric(vertical: 20),
-              child: CircleAvatar(radius: size.width/5, backgroundImage: MemoryImage(user.foto)),
+              child: Container(
+                child: CircleAvatar(radius: size.width/5, backgroundImage: MemoryImage(user.foto)),
+                decoration: new BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: new Border.all(
+                    width: 1.0,
+                  ),
+                ),),
             ),
           ],
         ),
@@ -143,7 +150,7 @@ class _InfoAcademica extends StatelessWidget {
         Text('Información',style: TextStyle(fontSize: 28,fontWeight: FontWeight.bold),),
         SizedBox(height: 10),
         textoDato(titulo: 'Nombre', cuerpo: user.nombre),
-        textoDato(titulo: 'Matricula', cuerpo: user.identificador),
+        textoDato(titulo: (user.titulo.toUpperCase()=='ALUMNO')?'Matricula':'Codigo de empleado', cuerpo: user.identificador),
         textoDato(titulo: 'Correo Institucional', cuerpo: user.correoInstitucional),
         textoDato(titulo: 'Status', cuerpo: user.titulo),
         if(user.departamento!='') textoDato(titulo: 'Departamento', cuerpo: user.departamento),
