@@ -112,7 +112,7 @@ class _ListaCupones extends StatelessWidget {
       child: ListView.builder(
         itemCount: cuponesGenericos.length,
         itemBuilder: (BuildContext context,int index){
-          return _Cuerpo(cupon: cuponesGenericos[index]);
+          return _Cuerpo(cupon: cuponesGenericos[index],prefUser: prefUser,);
         }
       ),
     );
