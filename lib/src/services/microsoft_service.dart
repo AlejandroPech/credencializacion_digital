@@ -93,6 +93,7 @@ class MicrosoftService{
       });
       final json=jsonDecode(response.body);
       prefUser.nombreUsuario=json['displayName'];
+      // var cosa=json['officeLocation'];
       prefUser.identificadorUsuario=json['mail'].toString().substring(0,8);
     }else{
       final url='https://api.utmetropolitana.edu.mx/api/Empleados/Get?correoinstitucional='+usuariocorreo;

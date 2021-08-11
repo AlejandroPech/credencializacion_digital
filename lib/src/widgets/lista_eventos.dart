@@ -5,10 +5,12 @@ import 'package:credencializacion_digital/src/services/eventos_service.dart';
 import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
 
-class ListaEventos extends StatelessWidget {
+class ListaEventos extends StatefulWidget {
   const ListaEventos({
     @required this.eventos,
   });
@@ -16,11 +18,21 @@ class ListaEventos extends StatelessWidget {
   final List<Evento> eventos;
 
   @override
+  _ListaEventosState createState() => _ListaEventosState();
+}
+
+class _ListaEventosState extends State<ListaEventos> {
+  @override
+  void initState() {
+    super.initState();
+    initializeDateFormatting('es');
+  }
+  @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: eventos.length,
+      itemCount: widget.eventos.length,
       itemBuilder: (BuildContext context,int index){
-        return _Evento(evento: eventos[index],index: index,);
+        return _Evento(evento: widget.eventos[index],index: index,);
       },
     );
   }
@@ -39,12 +51,12 @@ class _Evento extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _TarjetaTitulo(evento: evento,),
+          // _TarjetaTitulo(evento: evento,),
           _TarjetaImagen(evento:evento),
           _TarjetaCuerpo(evento: evento),
           _TarjetaBotones(evento: evento),
           SizedBox(height: 5),
-          Divider(height: 2,thickness: 2,),
+          Divider(height: 4,thickness: 3,),
           SizedBox(height: 15),
         ],
       ),
@@ -73,11 +85,30 @@ class _TarjetaImagen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: ClipRRect(
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(50),bottomRight: Radius.circular(50)),
-        child: (evento.urlImagen.isNotEmpty)? Image.memory(base64Decode(evento.urlImagen),gaplessPlayback: true,)
-          :Image(image: AssetImage('assets/img/no-image.png'),)
-        
+      margin: EdgeInsets.only(top: 20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 200,
+            height:150,
+            child: ClipRRect(
+              borderRadius: BorderRadius.all(Radius.circular(25)),
+              child: (evento.urlImagen.isNotEmpty)? Image.memory(base64Decode(evento.urlImagen),gaplessPlayback: true,fit: BoxFit.cover,)
+                :Image(image: AssetImage('assets/img/no-image.png'),)
+              
+            ),
+          ),
+          Expanded(
+            child: Column(
+              children:[
+                Text(evento.titulo+" cosa",style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold),maxLines: 4,),
+                Text((DateFormat.yMMMMd('es').format(evento.fechaInicio)).toString(),textAlign: TextAlign.center,)
+              ]
+            ),
+          ),
+          
+        ],
       ),
     );
   }
@@ -96,7 +127,9 @@ class _TarjetaCuerpo extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(evento.autor.nombre,style: TextStyle(fontSize: 22),),
-          Html(data: evento.contenido),
+          Html(data: evento.contenido,
+          style: {'color':Style(color: Colors.red)},
+          ),
           // Text(evento.contenido,style: TextStyle(fontSize: 20),),
         ],
       ),
@@ -121,7 +154,7 @@ class _TarjetaBotones extends StatelessWidget {
             onTap: (){
               eventoService.checkLikeEvent(prefUser.identificadorUsuario, evento.eventoId);
             },
-            child:(evento.favoritos.any((element) => element.identificador==prefUser.identificadorUsuario))?Icon(Icons.favorite,color: appTheme.accentColor,):Icon(Icons.favorite)
+            child:(evento.favoritos.any((element) => element.identificador==prefUser.identificadorUsuario))?Icon(Icons.favorite,color: Colors.red):Icon(Icons.favorite)
           ),
           Text(evento.fechaInicio.toString())
         ],

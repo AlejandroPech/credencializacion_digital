@@ -8,30 +8,19 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 // final _urlApi='http://192.168.54.100:9095/api/';
-final _urlApi='http://192.168.54.100:9095/api/';
+final _urlApi='http://192.168.54.102:9096/api/';
 
 class EventosService with ChangeNotifier{
-  List<Evento> eventos=[];
-  List<String> categorias=['Todos','Hoy','Esta Semana','Este Quatri', 'Este año'];
+  List<String> categorias=['Todos','Hoy','Esta Semana','Este Cuatrimestre', 'Este año'];
   String _categoriaSeleccionada='Todos';
   Map<String,List<Evento>> categoriasEvento={};
   bool _estaCargando=true;
   PrefUser prefUser = new PrefUser();
   EventosService(){
-    this.getEvents();
     categorias.forEach((element) {
       this.categoriasEvento[element]=[];
     });
     this.getEventoCategoria(_categoriaSeleccionada);
-  }
-
-  getEvents()async{
-    
-    final newResponse=await http.get(Uri.parse(_urlApi+'Event/GetPublished'));
-    final response=eventosResponse(newResponse.body);
-    // eventos=[];
-    this.eventos.addAll(response.eventos);
-    notifyListeners();
   }
 
   String get categoriaSeleccionada=>_categoriaSeleccionada;
@@ -65,7 +54,7 @@ class EventosService with ChangeNotifier{
       case 'Esta Semana':
         return 'GetWeek';
         break;
-      case 'Este Quatri':
+      case 'Este Cuatrimestre':
         return 'GetQuarter';
         break;
       case 'Este año':

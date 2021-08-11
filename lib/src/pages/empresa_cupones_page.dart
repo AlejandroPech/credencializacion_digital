@@ -28,7 +28,7 @@ class EmpresaCuponesPage extends StatefulWidget {
 class _EmpresaCuponesPageState extends State<EmpresaCuponesPage> {
   List<CuponesImagen> _listCuponesImagen = [];
   String idCupon;
-  final String baseurl = "http://192.168.54.100:9097/api";
+  final String baseurl = "http://192.168.54.102:9097/api";
 
   void _dataFromApi() async {
     final Dio dio = new Dio();
@@ -41,8 +41,7 @@ class _EmpresaCuponesPageState extends State<EmpresaCuponesPage> {
       var responseData = response.data as List;
 
       setState(() {
-        _listCuponesImagen =
-            responseData.map((e) => CuponesImagen.fromJson(e)).toList();
+        _listCuponesImagen = responseData.map((e) => CuponesImagen.fromJson(e)).toList();
       });
     } on DioError catch (e) {
       print(e);
@@ -99,7 +98,7 @@ class CuponesImagenPagina extends StatelessWidget {
             size: size,
             imagen: this.imagen,
           ),
-          _Usuario(size: size),
+          // _Usuario(size: size),
           _Cupnoes(size: size, listaCupones: _listCuponesImagen),
         ],
       ),
@@ -117,7 +116,7 @@ class _ImagenAndButtonBack extends StatelessWidget {
   Widget build(BuildContext context) {
     final prefUser = PrefUser();
 
-    final String baseurl = "http://192.168.54.100:9097/api";
+    final String baseurl = "http://192.168.54.102:9097/api";
     return Stack(
       children: [
         Container(
@@ -125,8 +124,7 @@ class _ImagenAndButtonBack extends StatelessWidget {
           decoration: BoxDecoration(
               image: DecorationImage(
                   fit: BoxFit.cover,
-                  image: NetworkImage(
-                      "$baseurl/empresas/image?nombreArchivo=${this.imagen}"))),
+                  image: MemoryImage(base64Decode("${this.imagen}")))),
         ),
         SafeArea(
           child: BackButton(),
@@ -167,15 +165,19 @@ class _Usuario extends StatelessWidget {
                 child: Text(
                   prefUser.nombreUsuario,
                   style: TextStyle(
-                    fontSize: 28,
+                    fontSize: 26,
                   ),
                   maxLines: 2,
                 ),
               ),
               SizedBox(height: 4),
-              Text(
-                'Univeridad Tecnologica Metropolitana',
-                style: TextStyle(fontSize: 18),
+              Container(
+                width: size.width * 0.7,
+                child: Text(
+                  'Univeridad Tecnologica Metropolitana',
+                  style: TextStyle(fontSize: 16),
+                  maxLines: 2
+                ),
               ),
             ],
           ),
@@ -193,7 +195,7 @@ class _Cupnoes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Dio dio = new Dio();
-    final String baseurl = "http://192.168.54.100:9097/api";
+    final String baseurl = "http://192.168.54.102:9097/api";
     return Column(children: [
       ...listaCupones.map((cupones) => _Cupon(
             urlImage: "${cupones.imagen}",
@@ -222,12 +224,11 @@ class _Cupon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = Provider.of<ThemeChanger>(context);
-    final String baseurl = "http://192.168.54.100:9097/api";
+    final String baseurl = "http://192.168.54.102:9097/api";
     void _usarCupon() async {
       final Dio dio = new Dio();
       try {
-        var respuesta =
-            await dio.get("$baseurl/CuponesImagen/${this.idCupon}");
+        var respuesta = await dio.get("$baseurl/CuponesImagen/${this.idCupon}");
         print(respuesta.statusCode);
         print(respuesta.data);
 
@@ -262,8 +263,7 @@ class _Cupon extends StatelessWidget {
               decoration: BoxDecoration(
                   image: DecorationImage(
                       fit: BoxFit.cover,
-                      image: NetworkImage(
-                          "$baseurl/CuponesImagen/image?nombreArchivo=${this.urlImage}"))),
+                      image: MemoryImage(base64Decode("${this.urlImage}")))),
             ),
             Expanded(
               child: Column(

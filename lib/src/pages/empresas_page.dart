@@ -28,7 +28,7 @@ class _EmpresaPageState extends State<EmpresaPage> {
   //localhost ios 127.0.0.1
   //localhost Android 10.0.2.2
 
-  final String baseurl = "http://192.168.54.100:9097/api";
+  final String baseurl = "http://192.168.54.102:9097/api";
 
   void _dataFromApi() async {
     final Dio dio = new Dio();
@@ -95,14 +95,14 @@ class Carditem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String baseurl = "http://192.168.54.100:9097/api";
+    final String baseurl = "http://192.168.54.102:9097/api";
     return Card(
       child: Center(
         child: Column(
           children: <Widget>[
             Expanded(
-              child: Image.network(
-                "$baseurl/empresas/image?nombreArchivo=${this.image}",
+              child: Image.memory(
+                base64Decode("${this.image}"),
                 fit: BoxFit.cover,
               ),
             ),

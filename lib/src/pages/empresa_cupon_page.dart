@@ -26,7 +26,7 @@ class EmpresaCuponPage extends StatefulWidget {
 class _EmpresaCuponPageState extends State<EmpresaCuponPage> {
   List<CuponesGenericos> _listCuponesGenericos = [];
 
-  final String baseurl = "http://192.168.54.100:9097/api";
+  final String baseurl = "http://192.168.54.102:9097/api";
 
   void _dataFromApi() async {
     final Dio dio = new Dio();
@@ -56,20 +56,18 @@ class _EmpresaCuponPageState extends State<EmpresaCuponPage> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final prefUser=new PrefUser();
     List<CuponesGenericos> _listCuponGenerico = _listCuponesGenericos;
     return Scaffold(
       body: SafeArea(
-        child: ListView(
+        child: Column(
           children: [
             _ImagenAndButtonBack(
               size: size,
               urlImage: widget.image,
             ),
-            _Usuario(size: size),
-            _Cuerpo(
-              cuponGenerico: _listCuponGenerico,
-              idCupon: widget.idEm,
-            ),
+            // _Usuario(size: size),
+            Expanded(child: _ListaCupones(cuponesGenericos: _listCuponGenerico)),
           ],
         ),
       ),
@@ -85,7 +83,7 @@ class _ImagenAndButtonBack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseurl = "http://192.168.54.100:9097/api";
+    final baseurl = "http://192.168.54.102:9097/api";
     return Stack(
       children: [
         Container(
@@ -93,8 +91,7 @@ class _ImagenAndButtonBack extends StatelessWidget {
           decoration: BoxDecoration(
               image: DecorationImage(
                   fit: BoxFit.cover,
-                  image: NetworkImage(
-                      "$baseurl/empresas/image?nombreArchivo=${this.urlImage}"))),
+                  image: MemoryImage(base64Decode("${this.urlImage}")))),
         ),
         SafeArea(
           child: BackButton(),
@@ -104,27 +101,53 @@ class _ImagenAndButtonBack extends StatelessWidget {
   }
 }
 
+class _ListaCupones extends StatelessWidget {
+  final List<CuponesGenericos> cuponesGenericos;
+  final PrefUser prefUser;
+  const _ListaCupones({@required this.cuponesGenericos,@required this.prefUser});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: ListView.builder(
+        itemCount: cuponesGenericos.length,
+        itemBuilder: (BuildContext context,int index){
+          return _Cuerpo(cupon: cuponesGenericos[index]);
+        }
+      ),
+    );
+  }
+}
+
 class _Cuerpo extends StatelessWidget {
-  final List<CuponesGenericos> cuponGenerico;
   final String idCupon;
-  const _Cuerpo({this.cuponGenerico, this.idCupon});
-  final String baseurl = "http://192.168.54.100:9097/api";
+  final CuponesGenericos cupon;
+  final PrefUser prefUser;
+  final String baseurl = "http://192.168.54.102:9097/api";
+  
+
+  const _Cuerpo({this.idCupon,@required this.cupon,@required this.prefUser});
 
   void _usarCupon() async {
     final Dio dio = new Dio();
     try {
-      var respuesta =
-          await dio.get("$baseurl/CuponesGenericos/${this.idCupon}");
+      var respuesta = await dio.get("$baseurl/CuponesGenericos/${this.idCupon}");
       print(respuesta.statusCode);
       print(respuesta.data);
 
-      Map<String, dynamic> listacupon =
-          new Map<String, dynamic>.from(respuesta.data);
+      Map<String, dynamic> listacupon ={
+        'cuponImagenId':this.idCupon,
+        'matricula':prefUser.identificadorUsuario,
+        'cuponGeneridoId':null,
+        // 'departamento':usuario.departamento,
+      };
 
       if (respuesta.statusCode == 200) {
         var response = await dio.put(
             "$baseurl/CuponesGenericos/apply?id=${listacupon['cuponGeneridoId']}",
-            data: jsonEncode(listacupon));
+            data: jsonEncode(listacupon),
+            // headers: {"Content-Type": "application/json", "Accept" : "application/json"},
+        );
         if (response.statusCode == 200) {
           print("cupon usado");
         } else {
@@ -142,21 +165,25 @@ class _Cuerpo extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = Provider.of<ThemeChanger>(context);
     final Dio dio = new Dio();
-    final baseurl = "http://192.168.54.100:9097/api";
+    final baseurl = "http://192.168.54.102:9097/api";
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          textoPropiedad(titulo: 'Empresa', cuerpo: 'Burger King', id: '0'),
-          ...cuponGenerico.map((cupon) => textoPropiedad(
-              titulo: 'Fecha de vencimiento del cupón',
-              cuerpo: ("${cupon.fechaExpiracion.toString()}"),
-              id: ("${cupon.cuponesGenericoId}"))),
-          ...cuponGenerico.map((cupon) => textoPropiedad(
-              titulo: 'Porcentaje de descuento',
-              cuerpo: ("${cupon.porcentajeDescuento}"),
-              id: ("${cupon.cuponesGenericoId}"))),
+          textoPropiedad(titulo: 'Empresa', cuerpo: 'Burger King',),
+          textoPropiedad(
+            titulo: 'Fecha de vencimiento del cupón',
+            cuerpo: ("${cupon.fechaExpiracion.toString()}"),
+          ),
+          textoPropiedad(
+            titulo: 'Fecha de vencimiento del cupón',
+            cuerpo: ("${cupon.porcentajeDescuento.toString()}"),
+          ),
+          textoPropiedad(
+            titulo: 'Fecha de vencimiento del cupón',
+            cuerpo: ("${cupon.descripcion.toString()}"),
+          ),
           Center(
             child: ElevatedButton(
               onPressed: () {
@@ -173,7 +200,8 @@ class _Cuerpo extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                   primary: appTheme.currentTheme.accentColor),
             ),
-          )
+          ),
+          Divider(height: 10,thickness: 2,),
         ],
       ),
     );
@@ -182,7 +210,7 @@ class _Cuerpo extends StatelessWidget {
   Widget textoPropiedad(
           {@required String titulo,
           @required String cuerpo,
-          @required String id}) =>
+          }) =>
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -195,60 +223,7 @@ class _Cuerpo extends StatelessWidget {
             cuerpo,
             style: TextStyle(fontSize: 24),
           ),
-          Text(
-            id,
-            style: TextStyle(fontSize: 24),
-          ),
           SizedBox(height: 25)
         ],
       );
-}
-
-class _Usuario extends StatelessWidget {
-  const _Usuario({
-    @required this.size,
-  });
-
-  final Size size;
-
-  @override
-  Widget build(BuildContext context) {
-    final prefUser = PrefUser();
-    return Container(
-      height: size.height / 6,
-      width: size.width,
-      padding: EdgeInsets.symmetric(horizontal: 10),
-      margin: EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        children: [
-          CircleAvatar(
-              radius: size.height / 20,
-              backgroundImage: MemoryImage(
-                  Uint8List.fromList(prefUser.imagenUsuario.codeUnits))),
-          SizedBox(width: 15),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: size.width * 0.7,
-                child: Text(
-                  prefUser.nombreUsuario,
-                  style: TextStyle(
-                    fontSize: 28,
-                  ),
-                  maxLines: 2,
-                ),
-              ),
-              SizedBox(height: 4),
-              Text(
-                'Universidad Tecnologica Metropolitana',
-                style: TextStyle(fontSize: 18),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 }

@@ -18,24 +18,54 @@ class MenuWidget extends StatelessWidget {
     final appTheme = Provider.of<ThemeChanger>(context);
     return Drawer(
       child: Container(
+        // margin: EdgeInsets.symmetric(horizontal: 10),
+        // color: appTheme.currentTheme.accentColor.withAlpha(75),
         child: ListView(  
           children: [
-            buildHeader(
-              name: prefUser.nombreUsuario,
-              onClicked:()=>Navigator.pushReplacementNamed(context, CredencialPage.routeName),
-            ),
+            DrawerHeader(
+          //     decoration: BoxDecoration(
+          //       gradient: LinearGradient(
+          //   begin: Alignment.topRight,
+          //   end: Alignment.bottomLeft,
+          //   // stops: [0.5,1],
+          //   colors: [appTheme.currentTheme.accentColor,appTheme.currentTheme.scaffoldBackgroundColor,appTheme.currentTheme.accentColor]
+          // )
+              // ),
+              margin: EdgeInsets.only(bottom: 20),
+              padding: EdgeInsets.all(10),
+              child: Container(
+                // color:appTheme.currentTheme.accentColor,
+                // margin: EdgeInsets.symmetric(horizontal: 15),
+                child: Column(
+                  children: [
+                    CircleAvatar(radius: 60, backgroundImage: MemoryImage(Uint8List.fromList(prefUser.imagenUsuario.codeUnits))),
+                    Expanded(child: Text(prefUser.nombreUsuario,textAlign: TextAlign.center,maxLines: 2,)),
+                  ],
+                ),
+              )),
+            // buildHeader(
+            //   name: prefUser.nombreUsuario,
+            //   onClicked:()=>Navigator.pushReplacementNamed(context, CredencialPage.routeName),
+            // ),
             ListTile(
               leading: Icon(Icons.business,color: appTheme.currentTheme.accentColor,),
-              title: Text('Empresas'),
+              title: Text('Credencial',style: TextStyle(color: appTheme.currentTheme.accentColor),),
+              selectedTileColor: appTheme.currentTheme.accentColor.withAlpha(25),
+              // selected: true,
+              onTap: ()=>Navigator.pushReplacementNamed(context, CredencialPage.routeName),
+            ),
+            ListTile(
+              leading: Icon(Icons.business,color: Colors.black54,),
+              title: Text('Cupones',style: TextStyle(color: appTheme.currentTheme.textTheme.bodyText2.color.withAlpha(150)),),
               onTap: ()=>Navigator.pushReplacementNamed(context, EmpresaPage.routeName),
             ),
             ListTile(
-              leading: Icon(Icons.event,color: appTheme.currentTheme.accentColor,),
+              leading: Icon(Icons.event,color: Colors.black54,),
               title: Text('Eventos'),
               onTap: ()=>Navigator.pushReplacementNamed(context, EventosPage.routeName),
             ),
             ListTile(
-              leading: Icon( Icons.lightbulb_outline,color: appTheme.currentTheme.accentColor,),
+              leading: Icon( Icons.lightbulb_outline,color: Colors.black54,),
               title: Text('Dark Mode'),
               trailing: Switch.adaptive(
                 activeColor: appTheme.currentTheme.accentColor,
