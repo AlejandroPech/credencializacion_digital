@@ -6,14 +6,12 @@ import 'package:credencializacion_digital/src/pages/evento_page.dart';
 import 'package:credencializacion_digital/src/pages/inicio_sesion_page.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final appTheme= Provider.of<ThemeChanger>(context);
     return MaterialApp(
-      theme: appTheme.currentTheme,
+      theme: appTheme,
       debugShowCheckedModeBanner: false,
       title: 'Credencial Digital',
       initialRoute: InicioSesionPage.routeName,

@@ -15,7 +15,8 @@ class EventosPage extends StatelessWidget{
       child: Scaffold(
         drawer: MenuWidget(),
         appBar: AppBar(
-          title:Text('Eventos y Favoritos')
+          title:Text('Eventos y Favoritos',),
+          // backgroundColor: appTheme.scaffoldBackgroundColor,
         ),
         body: _Paginas(),
         bottomNavigationBar: _Navegacion(),
@@ -46,8 +47,6 @@ class _Navegacion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final navegacionModel=Provider.of<_NavegacionModel>(context);
-    final appTheme= Provider.of<ThemeChanger>(context).currentTheme;
-
     return BottomNavigationBar(
       currentIndex: navegacionModel.paginaActual,
       fixedColor: appTheme.accentColor,

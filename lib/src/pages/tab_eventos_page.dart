@@ -37,7 +37,6 @@ class _ListaCategorias extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final eventoService = Provider.of<EventosService>(context);
-    final appTheme= Provider.of<ThemeChanger>(context).currentTheme;
     return Container(
       height: 50,
       width: double.infinity,
@@ -50,6 +49,11 @@ class _ListaCategorias extends StatelessWidget {
             child: Column(
               children: [
                 MaterialButton(
+                  // color: appTheme.accentColor.withAlpha(0
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side:(eventoService.categoriaSeleccionada==eventoService.categorias[index])? BorderSide(color: appTheme.accentColor):BorderSide(color: appTheme.scaffoldBackgroundColor),
+                  ),
                   child:(eventoService.categoriaSeleccionada==eventoService.categorias[index])
                       ? Text(eventoService.categorias[index],style: TextStyle(color:appTheme.accentColor ),)
                       :Text(eventoService.categorias[index]),

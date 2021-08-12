@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:credencializacion_digital/src/models/CuponesImagen.dart';
 import 'package:credencializacion_digital/src/pages/empresa_cupon_page.dart';
@@ -7,10 +6,8 @@ import 'package:credencializacion_digital/src/pages/empresas_page.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:meta/meta.dart';
 import 'package:dio/dio.dart';
-import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
 
 class EmpresaCuponesPage extends StatefulWidget {
   static final String routeName = 'empresaCupones';
@@ -114,9 +111,6 @@ class _ImagenAndButtonBack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final prefUser = PrefUser();
-
-    final String baseurl = "http://192.168.54.102:9097/api";
     return Stack(
       children: [
         Container(
@@ -134,59 +128,6 @@ class _ImagenAndButtonBack extends StatelessWidget {
   }
 }
 
-class _Usuario extends StatelessWidget {
-  const _Usuario({
-    @required this.size,
-  });
-
-  final Size size;
-
-  @override
-  Widget build(BuildContext context) {
-    final prefUser = PrefUser();
-    return Container(
-      height: size.height / 6,
-      width: size.width,
-      padding: EdgeInsets.symmetric(horizontal: 10),
-      margin: EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        children: [
-          CircleAvatar(
-              radius: size.height / 20,
-              backgroundImage: MemoryImage(
-                  Uint8List.fromList(prefUser.imagenUsuario.codeUnits))),
-          SizedBox(width: 15),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: size.width * 0.7,
-                child: Text(
-                  prefUser.nombreUsuario,
-                  style: TextStyle(
-                    fontSize: 26,
-                  ),
-                  maxLines: 2,
-                ),
-              ),
-              SizedBox(height: 4),
-              Container(
-                width: size.width * 0.7,
-                child: Text(
-                  'Univeridad Tecnologica Metropolitana',
-                  style: TextStyle(fontSize: 16),
-                  maxLines: 2
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _Cupnoes extends StatelessWidget {
   final Size size;
   final List<CuponesImagen> listaCupones;
@@ -194,8 +135,6 @@ class _Cupnoes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Dio dio = new Dio();
-    final String baseurl = "http://192.168.54.102:9097/api";
     return Column(children: [
       ...listaCupones.map((cupones) => _Cupon(
             urlImage: "${cupones.imagen}",
@@ -223,7 +162,6 @@ class _Cupon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Provider.of<ThemeChanger>(context);
     final String baseurl = "http://192.168.54.102:9097/api";
     void _usarCupon() async {
       final Dio dio = new Dio();
@@ -298,7 +236,7 @@ class _Cupon extends StatelessWidget {
                       },
                       child: Text('Aplicar Cupón'),
                       style: ElevatedButton.styleFrom(
-                          primary: appTheme.currentTheme.accentColor),
+                          primary: appTheme.accentColor),
                     ),
                   ),
                 ],

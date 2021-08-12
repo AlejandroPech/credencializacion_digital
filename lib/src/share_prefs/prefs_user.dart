@@ -16,14 +16,6 @@ class PrefUser{
     this._prefs=await SharedPreferences.getInstance();
   }
 
-  //Get y Set del darkMOde
-  int get theme{
-    return _prefs.getInt('theme')?? 3;
-  }
-  set theme(int value){
-    _prefs.setInt('theme', value);
-  }
-
   String get tokenMicrosoft{
     return _prefs.getString('tokenMicrosoft')??'';
   }

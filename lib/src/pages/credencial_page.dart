@@ -7,7 +7,6 @@ import 'package:credencializacion_digital/src/widgets/menu_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_microsoft_authentication/flutter_microsoft_authentication.dart';
 import 'package:meta/meta.dart';
-import 'package:provider/provider.dart';
 
 class CredencialPage extends StatefulWidget {
   static final String routeName='credencial';
@@ -38,7 +37,6 @@ class _CredencialPageState extends State<CredencialPage> {
   @override
   Widget build(BuildContext context) {
     final size=MediaQuery.of(context).size;
-    final appTheme= Provider.of<ThemeChanger>(context).currentTheme;
     final prefUser = PrefUser();
     return Scaffold(
       drawer: MenuWidget(),

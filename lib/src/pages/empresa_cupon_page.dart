@@ -1,11 +1,9 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:credencializacion_digital/src/pages/empresas_page.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:meta/meta.dart';
 import 'package:credencializacion_digital/src/models/CuponesGenericos.dart';
 import 'package:dio/dio.dart';
@@ -67,7 +65,7 @@ class _EmpresaCuponPageState extends State<EmpresaCuponPage> {
               urlImage: widget.image,
             ),
             // _Usuario(size: size),
-            Expanded(child: _ListaCupones(cuponesGenericos: _listCuponGenerico)),
+            Expanded(child: _ListaCupones(cuponesGenericos: _listCuponGenerico, prefUser: prefUser,)),
           ],
         ),
       ),
@@ -83,7 +81,6 @@ class _ImagenAndButtonBack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseurl = "http://192.168.54.102:9097/api";
     return Stack(
       children: [
         Container(
@@ -163,9 +160,6 @@ class _Cuerpo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Provider.of<ThemeChanger>(context);
-    final Dio dio = new Dio();
-    final baseurl = "http://192.168.54.102:9097/api";
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10),
       child: Column(
@@ -198,7 +192,7 @@ class _Cuerpo extends StatelessWidget {
               },
               child: Text('Aplicar Cupón'),
               style: ElevatedButton.styleFrom(
-                  primary: appTheme.currentTheme.accentColor),
+                  primary: appTheme.accentColor),
             ),
           ),
           Divider(height: 10,thickness: 2,),

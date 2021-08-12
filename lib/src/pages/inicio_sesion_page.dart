@@ -5,7 +5,6 @@ import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_microsoft_authentication/flutter_microsoft_authentication.dart';
-import 'package:provider/provider.dart';
 
 class InicioSesionPage extends StatefulWidget {
   static final String routeName='inicioSesion';
@@ -41,7 +40,6 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final appTheme= Provider.of<ThemeChanger>(context);
     return FutureBuilder(
       future: cuentaIniciada(),
       builder: (BuildContext context,AsyncSnapshot snapshot){
@@ -67,7 +65,7 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
                     },
                     child: Text('Iniciar Sesión'),
                     style: ElevatedButton.styleFrom(
-                      primary: appTheme.currentTheme.accentColor
+                      primary: appTheme.accentColor
                     ),
                   ),
               

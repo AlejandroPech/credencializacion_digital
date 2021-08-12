@@ -5,11 +5,9 @@ import 'package:credencializacion_digital/src/pages/empresa_cupones_page.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:credencializacion_digital/src/widgets/menu_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:meta/meta.dart';
 import 'package:credencializacion_digital/src/models/Empresas.dart';
 import 'package:dio/dio.dart';
-import 'package:http/http.dart' as http;
 
 class EmpresaPage extends StatefulWidget {
   static final String routeName = 'empresa';
@@ -61,7 +59,6 @@ class _EmpresaPageState extends State<EmpresaPage> {
     } else {
       isLarge = false;
     }
-    final appTheme = Provider.of<ThemeChanger>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -72,7 +69,7 @@ class _EmpresaPageState extends State<EmpresaPage> {
         children: [
           ...empresas.map((empresa) => Carditem(
                 image: ("${empresa.url}"),
-                color: appTheme.currentTheme.accentColor,
+                color: appTheme.accentColor,
                 urlNavegar: EmpresaCuponPage.routeName,
                 idempresa: ("${empresa.empresaId}"),
               )),
@@ -95,7 +92,6 @@ class Carditem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String baseurl = "http://192.168.54.102:9097/api";
     return Card(
       child: Center(
         child: Column(
