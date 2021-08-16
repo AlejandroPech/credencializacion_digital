@@ -48,6 +48,9 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
             Future.microtask(() {
               Navigator.pushReplacementNamed(context, EmpresaPage.routeName);
             });
+            // Future.microtask((){
+            //   microsoftService.signOut(fma);
+            // });
           }else{
             return Scaffold(
               body: Column(

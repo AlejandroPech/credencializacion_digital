@@ -88,7 +88,10 @@ class _ImagenAndButtonBack extends StatelessWidget {
           decoration: BoxDecoration(
               image: DecorationImage(
                   fit: BoxFit.cover,
-                  image: MemoryImage(base64Decode("${this.urlImage}")))),
+                  image:(this.urlImage.isNotEmpty)
+                  ? MemoryImage(base64Decode("${this.urlImage}"))
+                  :AssetImage('assets/img/no-image.png'),
+              )),
         ),
         SafeArea(
           child: BackButton(),

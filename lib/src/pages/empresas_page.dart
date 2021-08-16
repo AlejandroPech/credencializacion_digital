@@ -97,10 +97,12 @@ class Carditem extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Expanded(
-              child: Image.memory(
+              child:(this.image.isNotEmpty)
+              ? Image.memory(
                 base64Decode("${this.image}"),
                 fit: BoxFit.cover,
-              ),
+              )
+              :Image.asset('assets/img/no-image.png')
             ),
             TextButton(
               onPressed: () {

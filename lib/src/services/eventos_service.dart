@@ -32,7 +32,7 @@ class EventosService with ChangeNotifier{
   }
 
   getEventoCategoria(String categoria)async{
-    if(this.categoriasEvento[categoria].length<=0){
+    if(this.categoriasEvento[categoria].length==0){
       this._estaCargando=true;
     }
     String url=getCategory(categoria);

@@ -1,7 +1,6 @@
 import 'package:credencializacion_digital/src/pages/tab_eventos_page.dart';
 import 'package:credencializacion_digital/src/pages/tab_favoritos_page.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
-import 'package:credencializacion_digital/src/widgets/menu_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,11 +12,15 @@ class EventosPage extends StatelessWidget{
     return ChangeNotifierProvider(
       create: (_)=>new _NavegacionModel(),
       child: Scaffold(
-        drawer: MenuWidget(),
-        appBar: AppBar(
-          title:Text('Eventos y Favoritos',),
-          // backgroundColor: appTheme.scaffoldBackgroundColor,
-        ),
+        // drawer: MenuWidget(),
+        // appBar: NewGradientAppBar(
+        //   // gradient: LinearGradient(
+        //   //   begin: Alignment.topLeft,
+        //   //   end: Alignment.bottomRight,
+        //   //   colors: [appTheme.accentColor,Color(0xff81c784)]
+        //   // ),
+        //   title:Text('Eventos y Favoritos',),
+        // ),
         body: _Paginas(),
         bottomNavigationBar: _Navegacion(),
       ),
@@ -26,7 +29,6 @@ class EventosPage extends StatelessWidget{
 }
 
 class _Paginas extends StatelessWidget {
-  
   @override
   Widget build(BuildContext context) {
     final navegacionModel=Provider.of<_NavegacionModel>(context);

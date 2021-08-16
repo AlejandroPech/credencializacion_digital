@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
       initialRoute: InicioSesionPage.routeName,
       routes: {
         InicioSesionPage.routeName:(context)=>InicioSesionPage(),
-        EmpresaPage.routeName:(context)=>EmpresaPage(title: "Empresas"),
+        EmpresaPage.routeName:(context)=>EmpresaPage(title: "Cupones"),
         CredencialPage.routeName:(context)=>CredencialPage(title: "Credencial Digital"),
         EmpresaCuponPage.routeName:(context)=>EmpresaCuponPage(title: "Cupon"),
         EmpresaCuponesPage.routeName:(context)=>EmpresaCuponesPage(title: "Cupones",),

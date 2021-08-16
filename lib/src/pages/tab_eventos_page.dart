@@ -2,7 +2,9 @@
 import 'package:credencializacion_digital/src/services/eventos_service.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:credencializacion_digital/src/widgets/lista_eventos.dart';
+import 'package:credencializacion_digital/src/widgets/menu_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:new_gradient_app_bar/new_gradient_app_bar.dart';
 import 'package:provider/provider.dart';
 
 class TabPaginaEventos extends StatefulWidget {
@@ -17,56 +19,43 @@ class _TabPaginaEventosState extends State<TabPaginaEventos> with AutomaticKeepA
   Widget build(BuildContext context) {
     super.build(context);
     final eventoService = Provider.of<EventosService>(context);
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            _ListaCategorias(),
-            if(!eventoService.estaCargando)
-              Expanded(child: ListaEventos(eventos: eventoService.getEventosSeleccionados,)),
-            if(eventoService.estaCargando)
-              Expanded(child: Center(child: CircularProgressIndicator(),)),
-          ],
-        )
-      ),
-    );
-  }
-}
-
-class _ListaCategorias extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final eventoService = Provider.of<EventosService>(context);
-    return Container(
-      height: 50,
-      width: double.infinity,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: eventoService.categorias.length,
-        itemBuilder: (BuildContext context,int index){
-          return Container(
-            padding: EdgeInsets.symmetric(horizontal: 10),
+    return DefaultTabController(
+      length: eventoService.categorias.length,
+      child: Scaffold(
+         drawer: MenuWidget(),
+          appBar: NewGradientAppBar(
+            // gradient: LinearGradient(
+            //   begin: Alignment.topLeft,
+            //   end: Alignment.bottomRight,
+            //   colors: [appTheme.accentColor,Color(0xff81c784)]
+            // ),
+            bottom: TabBar(
+              onTap: (index){
+                if(eventoService.categoriaSeleccionada!=eventoService.categorias[index]){
+                  eventoService.categoriaSeleccionada=eventoService.categorias[index];
+                }
+              },
+              isScrollable: true,
+              indicatorColor:appTheme.scaffoldBackgroundColor,
+              // physics: NeverScrollableScrollPhysics(),
+              tabs: List<Widget>.generate(eventoService.categorias.length, (index) {
+                return Tab(
+                  child: Text(eventoService.categorias[index]),
+                );
+              })
+            ),
+            title:Text('Eventos',),
+          ),
+        body: SafeArea(
             child: Column(
               children: [
-                MaterialButton(
-                  // color: appTheme.accentColor.withAlpha(0
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side:(eventoService.categoriaSeleccionada==eventoService.categorias[index])? BorderSide(color: appTheme.accentColor):BorderSide(color: appTheme.scaffoldBackgroundColor),
-                  ),
-                  child:(eventoService.categoriaSeleccionada==eventoService.categorias[index])
-                      ? Text(eventoService.categorias[index],style: TextStyle(color:appTheme.accentColor ),)
-                      :Text(eventoService.categorias[index]),
-                  onPressed: (){
-                    if(eventoService.categoriaSeleccionada!=eventoService.categorias[index]){
-                      eventoService.categoriaSeleccionada=eventoService.categorias[index];
-                    }
-                  }
-                ),
+                if(!eventoService.estaCargando)
+                  Expanded(child: ListaEventos(eventos: eventoService.getEventosSeleccionados,)),
+                if(eventoService.estaCargando)
+                  Expanded(child: Center(child: CircularProgressIndicator(),)),
               ],
-            ),
-          );
-        },
+            )
+          )
       ),
     );
   }
