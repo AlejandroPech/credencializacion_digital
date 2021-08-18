@@ -2,9 +2,11 @@ import 'package:credencializacion_digital/src/pages/empresas_page.dart';
 import 'package:credencializacion_digital/src/services/microsoft_service.dart';
 import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
+import 'package:credencializacion_digital/src/widgets/menu_widget.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_microsoft_authentication/flutter_microsoft_authentication.dart';
+import 'package:provider/provider.dart';
 
 class InicioSesionPage extends StatefulWidget {
   static final String routeName='inicioSesion';
@@ -40,6 +42,7 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final navegacionMenu=Provider.of<NavegacionMenuModel>(context);
     return FutureBuilder(
       future: cuentaIniciada(),
       builder: (BuildContext context,AsyncSnapshot snapshot){
@@ -62,6 +65,7 @@ class _InicioSesionPageState extends State<InicioSesionPage> {
                   ElevatedButton( 
                     onPressed: ()async {
                       await microsoftService.acquireTokenInteractively(fma);
+                      navegacionMenu.paginaActual=1;
                       if(prefUser.inicioSesion){
                         Navigator.pushReplacementNamed(context, EmpresaPage.routeName);
                       }

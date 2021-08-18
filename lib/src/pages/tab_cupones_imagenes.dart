@@ -1,28 +1,27 @@
 import 'dart:convert';
 
 import 'package:credencializacion_digital/src/models/CuponesImagen.dart';
-import 'package:credencializacion_digital/src/pages/empresa_cupon_page.dart';
-import 'package:credencializacion_digital/src/pages/empresas_page.dart';
+import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
+import 'package:credencializacion_digital/src/widgets/ventana_dialogo.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:dio/dio.dart';
 
-class EmpresaCuponesPage extends StatefulWidget {
+class TabCuponesImagen extends StatefulWidget {
   static final String routeName = 'empresaCupones';
-  final String title;
   final String idEm;
   final String image;
 
-  EmpresaCuponesPage({Key key, @required this.title, this.idEm, this.image})
+  TabCuponesImagen({Key key,@required this.idEm,@required this.image})
       : super(key: key);
 
   @override
-  _EmpresaCuponesPageState createState() => _EmpresaCuponesPageState();
+  _TabCuponesImagenState createState() => _TabCuponesImagenState();
 }
 
-class _EmpresaCuponesPageState extends State<EmpresaCuponesPage> {
+class _TabCuponesImagenState extends State<TabCuponesImagen> {
   List<CuponesImagen> _listCuponesImagen = [];
   String idCupon;
   final String baseurl = "http://192.168.54.102:9097/api";
@@ -30,16 +29,14 @@ class _EmpresaCuponesPageState extends State<EmpresaCuponesPage> {
   void _dataFromApi() async {
     final Dio dio = new Dio();
     try {
-      var response =
-          await dio.get("$baseurl/CuponesImagen/empresa/${widget.idEm}");
-      print(response.statusCode);
-      print(response.data);
+      var response = await dio.get("$baseurl/CuponesImagen/empresa/${widget.idEm}");
 
       var responseData = response.data as List;
-
-      setState(() {
-        _listCuponesImagen = responseData.map((e) => CuponesImagen.fromJson(e)).toList();
-      });
+      if(mounted){
+        setState(() {
+          _listCuponesImagen = responseData.map((e) => CuponesImagen.fromJson(e)).toList();
+        });
+      }
     } on DioError catch (e) {
       print(e);
     }
@@ -55,19 +52,18 @@ class _EmpresaCuponesPageState extends State<EmpresaCuponesPage> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Scaffold(
-      body: PageView(
-        children: [
-          CuponesImagenPagina(
-            size: size,
-            listCuponesImagen: _listCuponesImagen,
-            imagen: widget.image,
-          ),
-          EmpresaCuponPage(
-            title: "empresa",
-            idEm: widget.idEm,
-            image: widget.image,
-          )
-        ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: CuponesImagenPagina(
+                size: size,
+                listCuponesImagen: _listCuponesImagen,
+                imagen: widget.image,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -88,47 +84,13 @@ class CuponesImagenPagina extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final PrefUser prefUser=PrefUser();
     return SafeArea(
       child: ListView(
         children: [
-          _ImagenAndButtonBack(
-            size: size,
-            imagen: this.imagen,
-          ),
-          // _Usuario(size: size),
-          _Cupnoes(size: size, listaCupones: _listCuponesImagen),
+          _Cupnoes(size: size, listaCupones: _listCuponesImagen,prefUser:prefUser),
         ],
       ),
-    );
-  }
-}
-
-class _ImagenAndButtonBack extends StatelessWidget {
-  final Size size;
-  final String imagen;
-
-  const _ImagenAndButtonBack({@required this.size, @required this.imagen});
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          height: size.height / 4,
-          decoration: BoxDecoration(
-              image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image:(this.imagen.isNotEmpty)
-                  ? MemoryImage(base64Decode("${this.imagen}"))
-                  :AssetImage('assets/img/no-image.png'),
-              )
-          )
-                  
-        ),
-        SafeArea(
-          child: BackButton(),
-        ),
-      ],
     );
   }
 }
@@ -136,7 +98,9 @@ class _ImagenAndButtonBack extends StatelessWidget {
 class _Cupnoes extends StatelessWidget {
   final Size size;
   final List<CuponesImagen> listaCupones;
-  const _Cupnoes({this.size, this.listaCupones});
+  final PrefUser prefUser;
+
+  const _Cupnoes({this.size, this.listaCupones,@required this.prefUser});
 
   @override
   Widget build(BuildContext context) {
@@ -147,6 +111,7 @@ class _Cupnoes extends StatelessWidget {
             descripcion: ("${cupones.descripcion}"),
             idCupon: ("${cupones.cuponesImagenId}"),
             listaCupones: listaCupones,
+            prefUser: prefUser,
           )),
     ]);
   }
@@ -157,11 +122,13 @@ class _Cupon extends StatelessWidget {
   final String urlImage;
   final String descripcion;
   final String idCupon;
+  final PrefUser prefUser;
   final List<CuponesImagen> listaCupones;
   const _Cupon(
       {@required this.urlImage,
       @required this.size,
       @required this.descripcion,
+      @required this.prefUser,
       this.idCupon,
       this.listaCupones});
 
@@ -175,20 +142,41 @@ class _Cupon extends StatelessWidget {
         print(respuesta.statusCode);
         print(respuesta.data);
 
-        Map<String, dynamic> listacupon =
-            new Map<String, dynamic>.from(respuesta.data);
+        Map<String, dynamic> listacupon ={
+        'cuponImagenId':this.idCupon,
+        'matricula':prefUser.identificadorUsuario,
+        'cuponGeneridoId':null,
+        'departamento':prefUser.departamento,
+      };
 
         if (respuesta.statusCode == 200) {
           var response = await dio.put(
               "$baseurl/CuponesImagen/apply/?id=${this.idCupon}",
               data: jsonEncode(listacupon));
           if (response.statusCode == 200) {
+            showDialog(context: context, builder: (context){
+              return VentanaDialogo(
+                titulo: "Cupon Utilizado", 
+                cuerpo: "El cupon se ha utilizado correctamente",
+                imagen: Image.memory(base64Decode("${this.urlImage}")),
+              );
+            });
             print("cupon usado");
           } else {
-            print("cupon no usado");
+            showDialog(context: context, builder: (context){
+            return VentanaDialogo(
+              titulo: "Error", 
+              cuerpo: "Lo sentimos pero ha ocurrido un error, intentelo nuevamente mas tarde",
+            );
+          });
           }
         } else {
-          print("Error en status code");
+          showDialog(context: context, builder: (context){
+            return VentanaDialogo(
+              titulo: "Error", 
+              cuerpo: "Lo sentimos pero ha ocurrido un error, intentelo nuevamente mas tarde",
+            );
+          });
         }
       } on DioError catch (e) {
         print(e);
@@ -206,7 +194,9 @@ class _Cupon extends StatelessWidget {
               decoration: BoxDecoration(
                   image: DecorationImage(
                       fit: BoxFit.cover,
-                      image: MemoryImage(base64Decode("${this.urlImage}")))),
+                      image: MemoryImage(base64Decode("${this.urlImage}"))
+                  )
+              ),
             ),
             Expanded(
               child: Column(
@@ -230,14 +220,6 @@ class _Cupon extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {
                         _usarCupon();
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => EmpresaPage(
-                                    title: "Empresa",
-                                  )),
-                        );
                       },
                       child: Text('Aplicar Cupón'),
                       style: ElevatedButton.styleFrom(

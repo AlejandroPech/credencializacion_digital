@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:credencializacion_digital/src/pages/empresa_cupon_page.dart';
-import 'package:credencializacion_digital/src/pages/empresa_cupones_page.dart';
+import 'package:credencializacion_digital/src/pages/cupones_page.dart';
+import 'package:credencializacion_digital/src/pages/tab_cupones_genericos.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:credencializacion_digital/src/widgets/menu_widget.dart';
 import 'package:flutter/material.dart';
@@ -35,10 +35,12 @@ class _EmpresaPageState extends State<EmpresaPage> {
       print(response.statusCode);
       print(response.data);
       List responseData = jsonDecode(response.data);
-
-      setState(() {
-        empresas = responseData.map((e) => Empresas.fromJson(e)).toList();
-      });
+      if(mounted){
+        setState(() {
+          empresas = responseData.map((e) => Empresas.fromJson(e)).toList();
+        });
+      }
+      
     } on DioError catch (e) {
       print(e);
     }
@@ -70,8 +72,9 @@ class _EmpresaPageState extends State<EmpresaPage> {
           ...empresas.map((empresa) => Carditem(
                 image: ("${empresa.url}"),
                 color: appTheme.accentColor,
-                urlNavegar: EmpresaCuponPage.routeName,
+                urlNavegar: TabCuponesGenericos.routeName,
                 idempresa: ("${empresa.empresaId}"),
+                nombreEmpresa: empresa.nombreEmpresa,
               )),
         ],
       ),
@@ -84,11 +87,12 @@ class Carditem extends StatelessWidget {
   final Color color;
   final String urlNavegar;
   final String idempresa;
+  final String nombreEmpresa;
   const Carditem(
       {@required this.image,
       @required this.color,
       @required this.urlNavegar,
-      @required this.idempresa});
+      @required this.idempresa, this.nombreEmpresa});
 
   @override
   Widget build(BuildContext context) {
@@ -108,8 +112,8 @@ class Carditem extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(
                     MaterialPageRoute<Null>(builder: (BuildContext context) {
-                  return new EmpresaCuponesPage(
-                      idEm: idempresa, image: image, title: "empresa");
+                  return new CuponesPage(
+                      idEm: idempresa, image: image,nombreImagen: nombreEmpresa,);
                 }));
               },
               child: Text(

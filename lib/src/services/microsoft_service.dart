@@ -10,7 +10,7 @@ import 'package:http/http.dart' as http;
 class MicrosoftService{
   String value="value";
   String imagenUsuario = "https://graph.microsoft.com/v1.0/me/photo/\$value";
-  String perfilUsuario = "https://graph.microsoft.com/v1.0/me/";
+  String perfilUsuario = 'http://192.168.54.102:9096/api';
   String _authToken = '';
   final prefUser = PrefUser();
 
@@ -61,16 +61,16 @@ class MicrosoftService{
     final usuariocorreo=await fma.loadAccount;
     final token=await loadToken(fma);
     if(int.tryParse(usuariocorreo.substring(0,8))!=null  && usuariocorreo.substring(8,9)=='@'){
-      var response = await http.get(Uri.parse(perfilUsuario), headers: {
-        "Authorization": "Bearer " + token
-      });
+      var response = await http.post(Uri.parse(perfilUsuario+'/Users/student'), 
+        body: jsonEncode({'code': token}),
+        headers: {"Content-Type": "application/json-patch+json", "Accept" : "*/*"},
+      );
       final usuario=alumnoResponse(response.body,prefUser.imagenUsuario);
       return usuario;
     }else{
-      final url='https://api.utmetropolitana.edu.mx/api/Empleados/Get?correoinstitucional='+usuariocorreo;
+      final url=perfilUsuario+'/Users/empleado/'+usuariocorreo;
       var response = await http.get(Uri.parse(url));
-      final jsonResponse=jsonDecode(response.body.replaceAll('[','').replaceAll(']',''));
-      final usuario=empleadoResponse(jsonResponse, prefUser.imagenUsuario);
+      final usuario=empleadoResponse(response.body, prefUser.imagenUsuario);
       return usuario;
     }
   }
@@ -88,20 +88,22 @@ class MicrosoftService{
     final token=await loadToken(fma);
     final usuariocorreo=await fma.loadAccount;
     if(int.tryParse(usuariocorreo.substring(0,8))!=null  && usuariocorreo.substring(8,9)=='@'){
-      var response = await http.get(Uri.parse(perfilUsuario), headers: {
-        "Authorization": "Bearer " + token
-      });
+      var response = await http.post(Uri.parse(perfilUsuario+'/Users/student'), 
+        body: jsonEncode({'code': token}),
+        headers: {"Content-Type": "application/json-patch+json", "Accept" : "*/*"},
+      );
       final json=jsonDecode(response.body);
       prefUser.nombreUsuario=json['displayName'];
       // var cosa=json['officeLocation'];
       prefUser.identificadorUsuario=json['mail'].toString().substring(0,8);
+      prefUser.departamento=json['officeLocation']??'';
     }else{
-      final url='https://api.utmetropolitana.edu.mx/api/Empleados/Get?correoinstitucional='+usuariocorreo;
+      final url=perfilUsuario+'/Users/empleado/'+usuariocorreo;
       var response = await http.get(Uri.parse(url));
-      final jsonResponse=jsonDecode(response.body.replaceAll('[','').replaceAll(']',''));
-      final json=jsonDecode(jsonResponse);
+      final json=jsonDecode(response.body);
       prefUser.nombreUsuario=(json['PrimerNombre']+" "??'')+(json['SegundoNombre']+" "??'')+(json['PrimerApellido']+" "??'')+(json['SegundoApellido']+" "??'');
       prefUser.identificadorUsuario=json['ClaveEmpleado'];
+      prefUser.departamento= json['Departamento']??'';
     }
   }
 

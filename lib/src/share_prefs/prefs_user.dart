@@ -64,4 +64,12 @@ class PrefUser{
   set identificadorUsuario(String value){
     _prefs.setString('identificadorUsuario', value);
   }
+
+  String get departamento{
+    return _prefs.getString('departamento')??'';
+  }
+
+  set departamento(String value){
+    _prefs.setString('departamento', value);
+  }
 }

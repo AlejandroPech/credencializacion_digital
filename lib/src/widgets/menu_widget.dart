@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:credencializacion_digital/src/pages/evento_page.dart';
+import 'package:credencializacion_digital/src/pages/eventos_page.dart';
 import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
 import 'package:credencializacion_digital/src/theme/theme.dart';
 import 'package:flutter/material.dart';

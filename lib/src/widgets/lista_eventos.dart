@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'package:credencializacion_digital/src/models/EventoModel.dart';
 import 'package:credencializacion_digital/src/services/eventos_service.dart';
 import 'package:credencializacion_digital/src/share_prefs/prefs_user.dart';
+import 'package:credencializacion_digital/src/widgets/imagen_pantalla_completa.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:photo_view/photo_view.dart';
 
 class ListaEventos extends StatefulWidget {
   const ListaEventos({
@@ -52,7 +52,7 @@ class _Evento extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // _TarjetaTitulo(evento: evento,),
-          _TarjetaImagen(evento:evento),
+          _TarjetaCabecera(evento:evento),
           _TarjetaCuerpo(evento: evento),
           _TarjetaBotones(evento: evento),
           SizedBox(height: 5),
@@ -64,20 +64,22 @@ class _Evento extends StatelessWidget {
   }
 }
 
-class _TarjetaImagen extends StatelessWidget {
+class _TarjetaCabecera extends StatelessWidget {
   final Evento evento;
-  const _TarjetaImagen({@required this.evento});
-
+  const _TarjetaCabecera({@required this.evento});
   @override
   Widget build(BuildContext context) {
     return Container(
-      height:155,
+      constraints:(evento.urlImagen.isNotEmpty)
+        ?BoxConstraints(minHeight:100, maxHeight: 160)
+        :BoxConstraints(minHeight:0),
       margin: EdgeInsets.only(top: 20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _Imagen(evento: evento),
-          TituloyFecha(evento: evento),
+          if(evento.urlImagen.isNotEmpty) 
+            _Imagen(evento: evento),
+            Expanded(child: TituloyFecha(evento: evento))
         ],
       ),
     );
@@ -91,25 +93,22 @@ class TituloyFecha extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-          crossAxisAlignment:CrossAxisAlignment.start,
-          children:[
-            Expanded(
-              child: Container(
-                margin:EdgeInsets.only(left:10),
-                child: Text(evento.titulo,style: TextStyle(fontSize: 24,fontWeight: FontWeight.bold),)
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text((DateFormat.yMMMMd('es').format(evento.fechaInicio)),textAlign: TextAlign.center,),
-              ],
-            ),
-          ]
-        ),
-    );
+    return Column(
+        crossAxisAlignment:CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children:[
+          Container(
+                  margin:EdgeInsets.only(left:10),
+                  child: Text(evento.titulo+'',style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold),maxLines: 5,)
+                ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text((DateFormat.yMMMMd('es').format(evento.fechaInicio)),textAlign: TextAlign.center,style: TextStyle(fontSize: 18),),
+            ],
+          ),
+        ]
+      );
   }
 }
 
@@ -122,90 +121,16 @@ class _Imagen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 200,
-      height:150,
+      height:155,
       child: ClipRRect(
         borderRadius: BorderRadius.all(Radius.circular(25)),
-        child: (evento.urlImagen.isNotEmpty)
-          ? ImageFullScreenWrapperWidget(child: Image.memory(base64Decode(evento.urlImagen),gaplessPlayback: true,fit: BoxFit.cover,),) 
-          : Image(image: AssetImage('assets/img/no-image.png'),)
-        
+        child: ImagenPantallaCompleta(child: Image.memory(base64Decode(evento.urlImagen),gaplessPlayback: true,fit: BoxFit.cover,),)
       ),
     );
   }
 }
 
-class ImageFullScreenWrapperWidget extends StatelessWidget {
-  final Image child;
-  final bool dark;
 
-  ImageFullScreenWrapperWidget({@required this.child,this.dark = true,});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          PageRouteBuilder(
-            opaque: true,
-            barrierColor: dark ? Colors.black : Colors.white,
-            pageBuilder: (BuildContext context, _, __) {
-              return FullScreenPage(
-                child: child,
-                dark: dark,
-              );
-            },
-          ),
-        );
-      },
-      child: child,
-    );
-  }
-}
-class FullScreenPage extends StatelessWidget {
-  FullScreenPage({@required this.child,@required this.dark,});
-  final Image child;
-  final bool dark;
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: dark ? Colors.black : Colors.white,
-      body: Stack(
-        children: [
-          Center(
-            child: Stack(
-              children: [
-                PhotoView(imageProvider: child.image,minScale:0.25,maxScale: 1.5,)
-              ],
-            ),
-          ),
-          SafeArea(
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: MaterialButton(
-                padding: const EdgeInsets.all(15),
-                elevation: 0,
-                child: Icon(
-                  Icons.arrow_back,
-                  color: dark ? Colors.white : Colors.black,
-                  size: 25,
-                ),
-                color: dark ? Colors.black12 : Colors.white70,
-                highlightElevation: 0,
-                minWidth: double.minPositive,
-                height: double.minPositive,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _TarjetaCuerpo extends StatelessWidget {
   final Evento evento;
@@ -229,6 +154,14 @@ class _TarjetaCuerpo extends StatelessWidget {
     return ExpansionTile(
       title: title,
       children: [
+        if(evento.esSugerido)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children:[
+              Text('Sugerido',style: TextStyle(color: Colors.red),),
+            ]
+          ),
+
         body,
       ],
     );

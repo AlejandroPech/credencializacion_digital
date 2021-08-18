@@ -12,15 +12,6 @@ class EventosPage extends StatelessWidget{
     return ChangeNotifierProvider(
       create: (_)=>new _NavegacionModel(),
       child: Scaffold(
-        // drawer: MenuWidget(),
-        // appBar: NewGradientAppBar(
-        //   // gradient: LinearGradient(
-        //   //   begin: Alignment.topLeft,
-        //   //   end: Alignment.bottomRight,
-        //   //   colors: [appTheme.accentColor,Color(0xff81c784)]
-        //   // ),
-        //   title:Text('Eventos y Favoritos',),
-        // ),
         body: _Paginas(),
         bottomNavigationBar: _Navegacion(),
       ),
