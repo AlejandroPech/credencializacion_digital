@@ -81,7 +81,7 @@ class MicrosoftService{
     });
 
     final bytes = response.body;
-    prefUser.imagenUsuario=bytes;
+    prefUser.imagenUsuario=bytes??'';
   }
 
   guardarDatos(FlutterMicrosoftAuthentication fma) async{

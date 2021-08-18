@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:meta/meta.dart';
 
 Usuario alumnoResponse(String str,String foto)=>Usuario.fromJsonAlumno(json.decode(str), foto);
@@ -10,7 +9,7 @@ class Usuario{
   String titulo;
   String correoInstitucional;
   String departamento;
-  Uint8List foto;
+  String foto;
   Usuario({
     @required this.identificador,
     @required this.nombre,
@@ -26,7 +25,7 @@ class Usuario{
     titulo: json['jobTitle']??'',
     correoInstitucional: json['mail']??'',
     departamento:(json['officeLocation']!=null)?json['officeLocation']:'',
-    foto: Uint8List.fromList(foto.codeUnits)??[],
+    foto: foto??'',
   );
   factory Usuario.fromJsonEmpleado(Map<String,dynamic> json,String foto)=>Usuario(
     identificador: json['ClaveEmpleado'],
@@ -34,6 +33,6 @@ class Usuario{
     titulo: json['TipoEmpleado'],
     correoInstitucional: json['CorreoInstitucional'],
     departamento: json['Departamento'],
-    foto: Uint8List.fromList(foto.codeUnits)??[],
+    foto:foto??'',
   );
 }

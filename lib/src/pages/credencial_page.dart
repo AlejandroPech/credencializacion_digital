@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:credencializacion_digital/src/models/UsuarioModel.dart';
 import 'package:credencializacion_digital/src/pages/inicio_sesion_page.dart';
 import 'package:credencializacion_digital/src/services/microsoft_service.dart';
@@ -120,7 +122,9 @@ class _InfoGeneral extends StatelessWidget {
             Container(
               margin: EdgeInsets.symmetric(vertical: 20),
               child: Container(
-                child: CircleAvatar(radius: size.width/5, backgroundImage: MemoryImage(user.foto)),
+                child:(user.foto.isNotEmpty)
+                ? CircleAvatar(radius: size.width/5, backgroundImage: MemoryImage(Uint8List.fromList(user.foto.codeUnits)))
+                :CircleAvatar(radius: size.width/5, backgroundImage: AssetImage('assets/img/no-user.jpg'),),
                 decoration: new BoxDecoration(
                   shape: BoxShape.circle,
                   border: new Border.all(
